@@ -125,10 +125,21 @@ function sendReceipt(idx) {
 function sendReport(idx) {
     let s = students[idx];
     let pCount = s.attendance[currentMonth].filter(x => x === "P").length;
-    let msg = (pCount >= 3) ? 
-        `*Attendance Report - Boss Thilina*\n\nආයුබෝවන්, ඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති ${pCount}ක් පන්තියට සහභාගී වී ඇත. කරුණාකර පන්ති ගාස්තු පියවීමට කටයුතු කරන්න. ස්තූතියි!` :
-        `*Student Report - Boss Thilina*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nමාසය: ${currentMonth}\nපැමිණීම: සති ${pCount}/4 කි.\n\nස්තූතියි!`;
+    let msg = "";
+
+    if (pCount === 3) {
+        // සති 3ක් ආපු අයට යන ඔයා ඉල්ලපු විශේෂ පණිවිඩය
+        msg = `ආයුබෝවන්,\nඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති 3ක් පන්තියට 🧑‍🏫සහභාගී වී ඇත. කරුණාකර ලබන සතියේ පන්ති ගාස්තු 💵පියවීමට කටයුතු කරන්න.\nස්තූතියි!🙏`;
+    } else if (pCount === 4) {
+        // සති 4ම ආපු අයට යන පණිවිඩය (ගාස්තු මතක් කිරීමක් ලෙස)
+        msg = `ආයුබෝවන්,\nඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති 4ම 🧑‍🏫සහභාගී වී ඇත. කරුණාකර පන්ති ගාස්තු 💵පියවීමට කටයුතු කරන්න.\nස්තූතියි!🙏`;
+    } else {
+        // සති 1ක් හෝ 2ක් ආපු අයට යන සාමාන්‍ය Report එක
+        msg = `*පැමිණීමේ වාර්තාව - ${currentMonth}*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nපැමිණීම: සති ${pCount}/4 කි. ✅\n\nස්තූතියි!`;
+    }
+
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
 }
 function addStudent() {
     let n = document.getElementById("studentName").value;
