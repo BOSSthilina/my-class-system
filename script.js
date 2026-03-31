@@ -61,27 +61,30 @@ function renderStudents() {
         card.innerHTML = `
             <div id="view-${idx}">
                 <h3 style="margin:0;">${s.name}</h3>
-                <span style="font-size:11px; color:#2c3e50; font-weight:bold;">${s.group}</span> | 
-                <span style="font-size:11px; color:#666;">${s.phone}</span>
+                <span style="font-size:11px; color:#2c3e50; font-weight:bold;">${s.group}</span>
+                
                 <div class="attendance-box">
                     ${s.attendance[currentMonth].map((v, i) => `<div class="att-day">W${i+1}<br><button class="att-btn ${v=='P'?'present':v=='A'?'absent':''}" onclick="markAtt(${idx},${i})">${v}</button></div>`).join('')}
                     <div class="att-day">පැමිණීම<br><b style="font-size:16px;">${pCount}</b></div>
                 </div>
-                <div style="margin-bottom:10px; background:#fffbe6; padding:5px; border-radius:5px; border:1px solid #ffe58f;">
-                    <label style="font-size:12px; font-weight:bold;">📝 විභාග ලකුණු:</label>
-                    <input type="number" id="marksInput-${idx}" value="${s.marks[currentMonth] || ''}" placeholder="00" style="width:60px; display:inline-block; margin:0 5px; padding:5px;" onchange="updateMarks(${idx}, this.value)">
+
+                <div style="margin-bottom:10px; background:#fffbe6; padding:8px; border-radius:5px; border:1px solid #ffe58f;">
+                    <label style="font-size:12px; font-weight:bold;">📝 Exam Score:</label>
+                    <input type="number" id="marksInput-${idx}" value="${s.marks[currentMonth] || ''}" placeholder="00" style="width:70px; display:inline-block; margin-left:10px; padding:5px;" onchange="updateMarks(${idx}, this.value)">
                 </div>
+
                 <div class="card-actions">
-                    <button class="pay-btn" onclick="pay(${idx})">${s.fees?.[currentMonth]==='Paid'?'Paid ✅':'Pay Rs.'+(feesList[s.group]||'')}</button>
-                    <button class="wa-btn" onclick="sendReceipt(${idx})">💵 Receipt</button>
-                    <button class="rep-btn" onclick="sendReport(${idx})">📊 Report</button>
-                    <button class="edit-btn-small" onclick="toggleEdit(${idx})" style="background:#7f8c8d; font-size:11px;">📝 Edit</button>
-                    <button class="del-btn" onclick="del(${idx})" style="grid-column: span 2; background:#bdc3c7; font-size:11px; margin-top:5px;">🗑️ Remove</button>
+                    <button class="pay-btn" onclick="pay(${idx})" style="background:#f39c12;">${s.fees?.[currentMonth]==='Paid'?'Paid ✅':'Pay Fees'}</button>
+                    <button class="rep-btn" onclick="sendReport(${idx})" style="background:#3498db;">📊 Send Result</button>
+                    <button class="wa-btn" onclick="sendReceipt(${idx})" style="background:#2ecc71;">💵 Receipt</button>
+                    <button class="edit-btn-small" onclick="toggleEdit(${idx})" style="background:#7f8c8d;">📝 Edit</button>
+                    <button class="del-btn" onclick="del(${idx})" style="grid-column: span 2; background:#bdc3c7; margin-top:5px;">🗑️ Remove Student</button>
                 </div>
             </div>
+
             <div id="edit-${idx}" style="display:none; background:#f9f9f9; padding:10px; border-radius:8px;">
-                <input type="text" id="editName-${idx}" value="${s.name}" placeholder="නම">
-                <input type="text" id="editPhone-${idx}" value="${s.phone}" placeholder="ෆෝන් අංකය">
+                <input type="text" id="editName-${idx}" value="${s.name}">
+                <input type="text" id="editPhone-${idx}" value="${s.phone}">
                 <select id="editGroup-${idx}">
                     ${Object.keys(feesList).map(g => `<option value="${g}" ${g===s.group?'selected':''}>${g}</option>`).join('')}
                 </select>
@@ -101,6 +104,28 @@ function updateMarks(idx, val) {
     saveData();
 }
 
+function sendReport(idx) {
+    let s = students[idx];
+    let currentMark = parseFloat(s.marks[currentMonth]) || 0;
+
+    // Rank එක හදන Logic එක
+    let groupStudents = students.filter(std => std.group === s.group);
+    let marksList = groupStudents
+        .map(std => parseFloat(std.marks[currentMonth]) || 0)
+        .sort((a, b) => b - a);
+
+    let rank = marksList.indexOf(currentMark) + 1;
+    let first = marksList[0] || 0;
+    let second = marksList[1] || 0;
+    let third = marksList[2] || 0;
+    let status = (s.fees && s.fees[currentMonth] === "Paid") ? "Paid ✅" : "Pending ⏳";
+
+    // ඔයා ඉල්ලපු අලුත් පණිවිඩය
+    let msg = `Student: ${s.name}\nGrade: ${s.group}\n--------------------------\n🏆 Your Child's Score: ${currentMark}\n📊 Class Rank: ${rank}\n\n🔥 Class Performance (${s.group}):\n- 🥇 1st Place: ${first}\n- 🥈 2nd Place: ${second}\n- 🥉 3rd Place: ${third}\n--------------------------\nStatus: ${status}\n\nThank you! 🙏\n- Thilina Bandara -`;
+
+    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
 function markAtt(idx, w) {
     let cur = students[idx].attendance[currentMonth][w];
     students[idx].attendance[currentMonth][w] = cur === "P" ? "A" : cur === "A" ? "-" : "P";
@@ -116,21 +141,7 @@ function pay(idx) {
 function sendReceipt(idx) {
     let s = students[idx];
     let amt = feesList[s.group];
-    let msg = `*Payment Receipt - Thilina Bandara*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nමාසය: ${currentMonth}\nගෙවූ මුදල: Rs.${amt}\nතත්වය: PAID ✅\n\nස්තූතියි!🙏`;
-    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-}
-
-function sendReport(idx) {
-    let s = students[idx];
-    let pCount = s.attendance[currentMonth].filter(x => x === "P").length;
-    let mark = s.marks[currentMonth] || "තවම ඇතුළත් කර නැත";
-    let msg = "";
-
-    if (pCount === 3) {
-        msg = `ආයුබෝවන්,\nඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති 3ක් පන්තියට 🧑‍🏫සහභාගී වී ඇත. 📝ලකුණු: ${mark}.\n\nකරුණාකර ලබන සතියේ පන්ති ගාස්තු 💵පියවීමට කටයුතු කරන්න.\nස්තූතියි!🙏\n- Thilina Bandara -`;
-    } else {
-        msg = `*පැමිණීමේ වාර්තාව - Thilina Bandara*\n\nදරුවා: ${s.name}\nමාසය: ${currentMonth}\nපැමිණීම: සති ${pCount}/4 ✅\n📝ලකුණු: ${mark}\n\nස්තූතියි!`;
-    }
+    let msg = `*Payment Receipt - Thilina Bandara*\n\nStudent: ${s.name}\nAmount: Rs.${amt}\nMonth: ${currentMonth}\nStatus: PAID ✅\n\nThank you!`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
