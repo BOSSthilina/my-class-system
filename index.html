@@ -3,80 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Management Simplified</title>
+    <title>Boss Thilina - Class Management</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="container">
-    <div id="loginBox">
-        <div class="login-card">
-            <h2>Admin Login</h2>
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="password" placeholder="Password">
-            <button class="login-btn" onclick="login()">Login</button>
-        </div>
+    <div id="loginBox" class="login-container">
+        <h2>Boss Thilina Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
     </div>
 
     <div id="mainContent" style="display:none;">
-        <div class="header">
-            <h2>Student Dashboard</h2>
+        <header>
+            <h2>Boss Thilina Dashboard</h2>
             <button class="logout-btn" onclick="logout()">Logout</button>
+        </header>
+
+        <!-- Dashboard Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">Total Students: <span id="totalCount">0</span></div>
+            <div class="stat-card">Today Att: <span id="todayAtt">0</span></div>
+            <div class="stat-card">Paid: <span id="paidCount">0</span></div>
         </div>
 
-        <div class="form-section">
-            <div class="input-group">
-                <input type="text" id="studentName" placeholder="Student Name">
-                <input type="text" id="parentPhone" placeholder="Phone (947XXXXXXXX)">
-                <select id="group">
-                    <option value="Grade 6">Grade 6</option>
-                    <option value="Grade 7">Grade 7</option>
-                    <option value="Grade 8">Grade 8</option>
-                    <option value="Grade 9">Grade 9</option>
-                    <option value="Grade 10">Grade 10</option>
-                    <option value="Grade 11">Grade 11</option>
-                </select>
-                <button class="add-btn" onclick="addStudent()">+ Add Student</button>
-            </div>
+        <div class="controls">
+            <input type="text" id="searchInput" placeholder="🔍 Search Student..." onkeyup="renderStudents()">
+            <select id="filterGroup" onchange="renderStudents()">
+                <option value="All">All Classes</option>
+                <option value="Grade 6 Friday">Grade 6 Friday (1000)</option>
+                <option value="Grade 7 Saturday">Grade 7 Saturday (1000)</option>
+                <option value="Grade 8 Sunday">Grade 8 Sunday (2000)</option>
+                <option value="Grade 8 Monday">Grade 8 Monday (1000)</option>
+                <option value="Grade 8 Tuesday">Grade 8 Tuesday (1000)</option>
+                <option value="Grade 9 Saturday">Grade 9 Saturday (2000)</option>
+                <option value="Grade 9 Sunday">Grade 9 Sunday (2000)</option>
+                <option value="Grade 9 Monday">Grade 9 Monday (1500)</option>
+                <option value="Grade 10 Wednesday">Grade 10 Wednesday (1500)</option>
+                <option value="Grade 10 Thursday">Grade 10 Thursday (2000)</option>
+                <option value="Grade 10 Sunday Paper">Grade 10 Sunday Paper</option>
+                <option value="Grade 11 Saturday">Grade 11 Saturday (2000)</option>
+                <option value="Grade 11 Friday Paper">Grade 11 Friday Paper</option>
+            </select>
+            <select id="monthSelect" onchange="changeMonth()">
+                <option value="January">January</option><option value="February">February</option>
+                <option value="March" selected>March</option><option value="April">April</option>
+                <option value="May">May</option><option value="June">June</option>
+                <option value="July">July</option><option value="August">August</option>
+                <option value="September">September</option><option value="October">October</option>
+                <option value="November">November</option><option value="December">December</option>
+            </select>
         </div>
 
-        <div class="controls-section">
-            <div class="control-item">
-                <label>Month:</label>
-                <select id="monthSelect" onchange="changeMonth()">
-                <option value="January">January</option>
-                <option value="February">February</option>
-                <option value="March" selected>March</option>
-                <option value="April">April</option>
-                <option value="May">May</option>
-                <option value="June">June</option>
-                <option value="July">July</option>
-                <option value="August">August</option>
-                <option value="September">September</option>
-                <option value="October">October</option>
-                <option value="November">November</option>
-                <option value="December">December</option>
-                </select>
-            </div>
-            <div class="control-item">
-                <label>Filter:</label>
-                <select id="filterGroup" onchange="renderStudents()">
-                    <option value="All">All Grades</option>
-                    <option value="Grade 6">Grade 6</option>
-                    <option value="Grade 7">Grade 7</option>
-                    <option value="Grade 8">Grade 8</option>
-                    <option value="Grade 9">Grade 9</option>
-                    <option value="Grade 10">Grade 10</option>
-                    <option value="Grade 11">Grade 11</option>
-                </select>
-            </div>
-            <button class="bulk-btn" onclick="sendAllReports()">📤 Send Bulk Marks Reports</button>
+        <div class="add-student">
+            <h3>Add New Student</h3>
+            <input type="text" id="studentName" placeholder="Student Name">
+            <input type="text" id="parentPhone" placeholder="Parent WhatsApp (e.g. 94771234567)">
+            <select id="newStudentGroup">
+                <option value="Grade 6 Friday">Grade 6 Friday</option>
+                <option value="Grade 7 Saturday">Grade 7 Saturday</option>
+                <option value="Grade 8 Sunday">Grade 8 Sunday</option>
+                <option value="Grade 8 Monday">Grade 8 Monday</option>
+                <option value="Grade 8 Tuesday">Grade 8 Tuesday</option>
+                <option value="Grade 9 Saturday">Grade 9 Saturday</option>
+                <option value="Grade 9 Sunday">Grade 9 Sunday</option>
+                <option value="Grade 9 Monday">Grade 9 Monday</option>
+                <option value="Grade 10 Wednesday">Grade 10 Wednesday</option>
+                <option value="Grade 10 Thursday">Grade 10 Thursday</option>
+                <option value="Grade 10 Sunday Paper">Grade 10 Sunday Paper</option>
+                <option value="Grade 11 Saturday">Grade 11 Saturday</option>
+                <option value="Grade 11 Friday Paper">Grade 11 Friday Paper</option>
+            </select>
+            <button onclick="addStudent()">Add Student</button>
         </div>
 
-        <div id="studentList" class="student-grid"></div>
+        <div id="studentList"></div>
     </div>
-</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
