@@ -5,7 +5,6 @@ const ADMIN_USER = "admin";
 const ADMIN_PASS = "123";
 let currentMonth = "March";
 
-// පන්ති සහ ගාස්තු ලැයිස්තුව
 const feesList = {
     "Grade 6 Friday": 1000, "Grade 7 Saturday": 1000,
     "Grade 8 Sunday": 2000, "Grade 8 Monday": 1000, "Grade 8 Tuesday": 1000,
@@ -14,7 +13,6 @@ const feesList = {
     "Grade 11 Saturday": 2000, "Grade 11 Friday Paper": "N/A"
 };
 
-// දත්ත Cloud එකෙන් ලබාගැනීම
 async function loadDataFromCloud() {
     try {
         const res = await fetch(SCRIPT_URL);
@@ -24,13 +22,11 @@ async function loadDataFromCloud() {
     renderStudents();
 }
 
-// දත්ත Cloud එකට සේව් කිරීම
 async function saveData() {
     localStorage.setItem("students", JSON.stringify(students));
     try { await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(students) }); } catch (e) {}
 }
 
-// Login පද්ධතිය
 function login() {
     if (document.getElementById("username").value === ADMIN_USER && document.getElementById("password").value === ADMIN_PASS) {
         localStorage.setItem("loggedIn", "true"); showApp();
@@ -43,7 +39,6 @@ function showApp() {
     loadDataFromCloud();
 }
 
-// සිසුන්ගේ විස්තර පෙන්වීම (Rendering)
 function renderStudents() {
     const list = document.getElementById("studentList");
     const filter = document.getElementById("filterGroup").value;
@@ -68,17 +63,14 @@ function renderStudents() {
                 <h3 style="margin:0;">${s.name}</h3>
                 <span style="font-size:11px; color:#2c3e50; font-weight:bold;">${s.group}</span> | 
                 <span style="font-size:11px; color:#666;">${s.phone}</span>
-                
                 <div class="attendance-box">
                     ${s.attendance[currentMonth].map((v, i) => `<div class="att-day">W${i+1}<br><button class="att-btn ${v=='P'?'present':v=='A'?'absent':''}" onclick="markAtt(${idx},${i})">${v}</button></div>`).join('')}
                     <div class="att-day">පැමිණීම<br><b style="font-size:16px;">${pCount}</b></div>
                 </div>
-
                 <div style="margin-bottom:10px; background:#fffbe6; padding:5px; border-radius:5px; border:1px solid #ffe58f;">
                     <label style="font-size:12px; font-weight:bold;">📝 විභාග ලකුණු:</label>
                     <input type="number" id="marksInput-${idx}" value="${s.marks[currentMonth] || ''}" placeholder="00" style="width:60px; display:inline-block; margin:0 5px; padding:5px;" onchange="updateMarks(${idx}, this.value)">
                 </div>
-
                 <div class="card-actions">
                     <button class="pay-btn" onclick="pay(${idx})">${s.fees?.[currentMonth]==='Paid'?'Paid ✅':'Pay Rs.'+(feesList[s.group]||'')}</button>
                     <button class="wa-btn" onclick="sendReceipt(${idx})">💵 Receipt</button>
@@ -87,7 +79,6 @@ function renderStudents() {
                     <button class="del-btn" onclick="del(${idx})" style="grid-column: span 2; background:#bdc3c7; font-size:11px; margin-top:5px;">🗑️ Remove</button>
                 </div>
             </div>
-
             <div id="edit-${idx}" style="display:none; background:#f9f9f9; padding:10px; border-radius:8px;">
                 <input type="text" id="editName-${idx}" value="${s.name}" placeholder="නම">
                 <input type="text" id="editPhone-${idx}" value="${s.phone}" placeholder="ෆෝන් අංකය">
@@ -104,36 +95,31 @@ function renderStudents() {
     });
 }
 
-// ලකුණු යාවත්කාලීන කිරීම
 function updateMarks(idx, val) {
     if(!students[idx].marks) students[idx].marks = {};
     students[idx].marks[currentMonth] = val;
     saveData();
 }
 
-// පැමිණීම සලකුණු කිරීම
 function markAtt(idx, w) {
     let cur = students[idx].attendance[currentMonth][w];
     students[idx].attendance[currentMonth][w] = cur === "P" ? "A" : cur === "A" ? "-" : "P";
     saveData(); renderStudents();
 }
 
-// ගාස්තු ගෙවීම සලකුණු කිරීම
 function pay(idx) {
     if(!students[idx].fees) students[idx].fees = {};
     students[idx].fees[currentMonth] = (students[idx].fees[currentMonth] === "Paid") ? "Pending" : "Paid";
     saveData(); renderStudents();
 }
 
-// WhatsApp රිසිට් පණිවිඩය
 function sendReceipt(idx) {
     let s = students[idx];
     let amt = feesList[s.group];
-    let msg = `*Payment Receipt - Boss Thilina*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nමාසය: ${currentMonth}\nගෙවූ මුදල: Rs.${amt}\nතත්වය: PAID ✅\n\nස්තූතියි!🙏`;
+    let msg = `*Payment Receipt - Thilina Bandara*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nමාසය: ${currentMonth}\nගෙවූ මුදල: Rs.${amt}\nතත්වය: PAID ✅\n\nස්තූතියි!🙏`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-// WhatsApp වාර්තාව (සති 3 විශේෂ පණිවිඩය සහ ලකුණු සමඟ)
 function sendReport(idx) {
     let s = students[idx];
     let pCount = s.attendance[currentMonth].filter(x => x === "P").length;
@@ -141,14 +127,13 @@ function sendReport(idx) {
     let msg = "";
 
     if (pCount === 3) {
-        msg = `ආයුබෝවන්,\nඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති 3ක් පන්තියට 🧑‍🏫සහභාගී වී ඇත. 📝ලකුණු: ${mark}.\n\nකරුණාකර ලබන සතියේ පන්ති ගාස්තු 💵පියවීමට කටයුතු කරන්න.\nස්තූතියි!🙏`;
+        msg = `ආයුබෝවන්,\nඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති 3ක් පන්තියට 🧑‍🏫සහභාගී වී ඇත. 📝ලකුණු: ${mark}.\n\nකරුණාකර ලබන සතියේ පන්ති ගාස්තු 💵පියවීමට කටයුතු කරන්න.\nස්තූතියි!🙏\n- Thilina Bandara -`;
     } else {
-        msg = `*පැමිණීමේ වාර්තාව - Boss Thilina*\n\nදරුවා: ${s.name}\nමාසය: ${currentMonth}\nපැමිණීම: සති ${pCount}/4 ✅\n📝ලකුණු: ${mark}\n\nස්තූතියි!`;
+        msg = `*පැමිණීමේ වාර්තාව - Thilina Bandara*\n\nදරුවා: ${s.name}\nමාසය: ${currentMonth}\nපැමිණීම: සති ${pCount}/4 ✅\n📝ලකුණු: ${mark}\n\nස්තූතියි!`;
     }
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-// සිසුවෙකුගේ විස්තර Edit කිරීම
 function toggleEdit(idx) {
     const v = document.getElementById(`view-${idx}`);
     const e = document.getElementById(`edit-${idx}`);
@@ -163,7 +148,6 @@ function updateStudent(idx) {
     saveData(); renderStudents();
 }
 
-// අලුත් සිසුවෙකු ඇතුළත් කිරීම
 function addStudent() {
     let n = document.getElementById("studentName").value;
     let p = document.getElementById("parentPhone").value;
@@ -175,7 +159,6 @@ function addStudent() {
     }
 }
 
-// ඉවත් කිරීම සහ Logout
 function del(idx) { if(confirm("Delete student?")) { students.splice(idx,1); saveData(); renderStudents(); } }
 function logout() { localStorage.removeItem("loggedIn"); location.reload(); }
 function changeMonth() { currentMonth = document.getElementById("monthSelect").value; renderStudents(); }
