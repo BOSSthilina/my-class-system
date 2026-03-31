@@ -5,7 +5,6 @@ const ADMIN_USER = "admin";
 const ADMIN_PASS = "123";
 let currentMonth = "March";
 
-// පන්ති ගාස්තු ලිස්ට් එක
 const feesList = {
     "Grade 6 Friday": 1000, "Grade 7 Saturday": 1000,
     "Grade 8 Sunday": 2000, "Grade 8 Monday": 1000, "Grade 8 Tuesday": 1000,
@@ -31,7 +30,7 @@ async function saveData() {
 function login() {
     if (document.getElementById("username").value === ADMIN_USER && document.getElementById("password").value === ADMIN_PASS) {
         localStorage.setItem("loggedIn", "true"); showApp();
-    } else { alert("Wrong!"); }
+    } else { alert("Login Failed!"); }
 }
 
 function showApp() {
@@ -48,7 +47,6 @@ function renderStudents() {
 
     let filtered = students.filter(s => (filter === "All" || s.group === filter) && s.name.toLowerCase().includes(search));
     
-    // Stats Update
     document.getElementById("totalCount").innerText = students.length;
     document.getElementById("paidCount").innerText = students.filter(s => s.fees?.[currentMonth] === "Paid").length;
 
@@ -60,16 +58,17 @@ function renderStudents() {
         let card = document.createElement("div");
         card.className = "student-card";
         card.innerHTML = `
-            <h3>${s.name} <small style="font-size:10px; color:blue;">(${s.group})</small></h3>
+            <h3 style="margin:0;">${s.name}</h3>
+            <span style="font-size:11px; color:#666;">${s.group}</span>
             <div class="attendance-box">
                 ${s.attendance[currentMonth].map((v, i) => `<div class="att-day">W${i+1}<br><button class="att-btn ${v=='P'?'present':v=='A'?'absent':''}" onclick="markAtt(${idx},${i})">${v}</button></div>`).join('')}
-                <div class="att-day">Total<br><b>${pCount}</b></div>
+                <div class="att-day">මුළු පැමිණීම<br><b style="font-size:16px;">${pCount}</b></div>
             </div>
             <div class="card-actions">
                 <button class="pay-btn" onclick="pay(${idx})">${s.fees?.[currentMonth]==='Paid'?'Paid ✅':'Pay Rs.'+(feesList[s.group]||'')}</button>
-                <button class="wa-btn" onclick="sendReceipt(${idx})">📩 Send Receipt</button>
-                <button class="wa-btn" style="background:#3498db" onclick="sendReport(${idx})">📊 Report</button>
-                <button class="del-btn" onclick="del(${idx})">🗑️</button>
+                <button class="wa-btn" onclick="sendReceipt(${idx})">💵 Receipt</button>
+                <button class="rep-btn" onclick="sendReport(${idx})">📊 Attendance</button>
+                <button class="del-btn" onclick="del(${idx})">🗑️ Remove Student</button>
             </div>
         `;
         list.appendChild(card);
@@ -91,14 +90,19 @@ function pay(idx) {
 function sendReceipt(idx) {
     let s = students[idx];
     let amt = feesList[s.group];
-    let msg = `*Payment Receipt - Boss Thilina*\n\nStudent: ${s.name}\nClass: ${s.group}\nMonth: ${currentMonth}\nAmount: Rs.${amt}\nStatus: PAID ✅\n\nThank you for the payment!`;
+    let msg = `*Payment Receipt - Boss Thilina*\n\nStudent: ${s.name}\nClass: ${s.group}\nMonth: ${currentMonth}\nAmount: Rs.${amt}\nStatus: PAID ✅\n\nස්තූතියි!`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 function sendReport(idx) {
     let s = students[idx];
-    let att = s.attendance[currentMonth].filter(x => x === "P").length;
-    let msg = `*Student Report - Boss Thilina*\n\nStudent: ${s.name}\nClass: ${s.group}\nMonth: ${currentMonth}\nAttendance: ${att}/4 Weeks\n\nKeep learning!`;
+    let pCount = s.attendance[currentMonth].filter(x => x === "P").length;
+    let msg = "";
+    if (pCount >= 3) {
+        msg = `*Attendance Report - Boss Thilina*\n\nආයුබෝවන්, ඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති ${pCount}ක් පන්තියට සහභාගී වී ඇත. කරුණාකර පන්ති ගාස්තු පියවීමට කටයුතු කරන්න. ස්තූතියි!`;
+    } else {
+        msg = `*Student Report - Boss Thilina*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nමාසය: ${currentMonth}\nපැමිණීම: සති ${pCount}/4 කි.\n\nස්තූතියි!`;
+    }
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
