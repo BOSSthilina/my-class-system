@@ -5,6 +5,7 @@ const ADMIN_USER = "admin";
 const ADMIN_PASS = "123";
 let currentMonth = "March";
 
+// පන්ති සහ ගාස්තු විස්තර
 const feesList = {
     "Grade 6 Friday": 1000, "Grade 7 Saturday": 1000,
     "Grade 8 Sunday": 2000, "Grade 8 Monday": 1000, "Grade 8 Tuesday": 1000,
@@ -13,6 +14,7 @@ const feesList = {
     "Grade 11 Saturday": 2000, "Grade 11 Friday Paper": "N/A"
 };
 
+// දත්ත ලබාගැනීම
 async function loadDataFromCloud() {
     try {
         const res = await fetch(SCRIPT_URL);
@@ -22,11 +24,13 @@ async function loadDataFromCloud() {
     renderStudents();
 }
 
+// දත්ත සේව් කිරීම
 async function saveData() {
     localStorage.setItem("students", JSON.stringify(students));
     try { await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(students) }); } catch (e) {}
 }
 
+// Login System
 function login() {
     if (document.getElementById("username").value === ADMIN_USER && document.getElementById("password").value === ADMIN_PASS) {
         localStorage.setItem("loggedIn", "true"); showApp();
@@ -39,6 +43,7 @@ function showApp() {
     loadDataFromCloud();
 }
 
+// සිසුන් පෙන්වීම සහ සෙවීම
 function renderStudents() {
     const list = document.getElementById("studentList");
     const filter = document.getElementById("filterGroup").value;
@@ -64,7 +69,7 @@ function renderStudents() {
                 <span style="font-size:11px; color:#666;">${s.phone}</span>
                 <div class="attendance-box">
                     ${s.attendance[currentMonth].map((v, i) => `<div class="att-day">W${i+1}<br><button class="att-btn ${v=='P'?'present':v=='A'?'absent':''}" onclick="markAtt(${idx},${i})">${v}</button></div>`).join('')}
-                    <div class="att-day">මුළු පැමිණීම<br><b style="font-size:16px;">${pCount}</b></div>
+                    <div class="att-day">පැමිණීම<br><b style="font-size:16px;">${pCount}</b></div>
                 </div>
                 <div class="card-actions">
                     <button class="pay-btn" onclick="pay(${idx})">${s.fees?.[currentMonth]==='Paid'?'Paid ✅':'Pay Rs.'+(feesList[s.group]||'')}</button>
@@ -90,6 +95,43 @@ function renderStudents() {
     });
 }
 
+// පැමිණීම සලකුණු කිරීම
+function markAtt(idx, w) {
+    let cur = students[idx].attendance[currentMonth][w];
+    students[idx].attendance[currentMonth][w] = cur === "P" ? "A" : cur === "A" ? "-" : "P";
+    saveData(); renderStudents();
+}
+
+// ගාස්තු සලකුණු කිරීම
+function pay(idx) {
+    if(!students[idx].fees) students[idx].fees = {};
+    students[idx].fees[currentMonth] = (students[idx].fees[currentMonth] === "Paid") ? "Pending" : "Paid";
+    saveData(); renderStudents();
+}
+
+// WhatsApp රිසිට් එක
+function sendReceipt(idx) {
+    let s = students[idx];
+    let amt = feesList[s.group];
+    let msg = `*Payment Receipt - Boss Thilina*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nමාසය: ${currentMonth}\nගෙවූ මුදල: Rs.${amt}\nතත්වය: PAID ✅\n\nස්තූතියි!`;
+    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// WhatsApp Report (සති 3 විශේෂ පණිවිඩය සමඟ)
+function sendReport(idx) {
+    let s = students[idx];
+    let pCount = s.attendance[currentMonth].filter(x => x === "P").length;
+    let msg = "";
+
+    if (pCount === 3) {
+        msg = `ආයුබෝවන්,\nඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති 3ක් පන්තියට 🧑‍🏫සහභාගී වී ඇත. කරුණාකර ලබන සතියේ පන්ති ගාස්තු 💵පියවීමට කටයුතු කරන්න.\nස්තූතියි!🙏`;
+    } else {
+        msg = `*පැමිණීමේ වාර්තාව - Boss Thilina*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nමාසය: ${currentMonth}\nපැමිණීම: සති ${pCount}/4 කි. ✅\n\nස්තූතියි!`;
+    }
+    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// Edit පහසුකම
 function toggleEdit(idx) {
     const v = document.getElementById(`view-${idx}`);
     const e = document.getElementById(`edit-${idx}`);
@@ -105,42 +147,7 @@ function updateStudent(idx) {
     renderStudents();
 }
 
-// --- පරණ Functions (markAtt, pay, sendReceipt, sendReport, addStudent, del, logout) එහෙම්මම තියන්න ---
-function markAtt(idx, w) {
-    let cur = students[idx].attendance[currentMonth][w];
-    students[idx].attendance[currentMonth][w] = cur === "P" ? "A" : cur === "A" ? "-" : "P";
-    saveData(); renderStudents();
-}
-function pay(idx) {
-    if(!students[idx].fees) students[idx].fees = {};
-    students[idx].fees[currentMonth] = (students[idx].fees[currentMonth] === "Paid") ? "Pending" : "Paid";
-    saveData(); renderStudents();
-}
-function sendReceipt(idx) {
-    let s = students[idx];
-    let amt = feesList[s.group];
-    let msg = `*Payment Receipt - Boss Thilina*\n\nStudent: ${s.name}\nClass: ${s.group}\nMonth: ${currentMonth}\nAmount: Rs.${amt}\nStatus: PAID ✅\n\nස්තූතියි!`;
-    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-}
-function sendReport(idx) {
-    let s = students[idx];
-    let pCount = s.attendance[currentMonth].filter(x => x === "P").length;
-    let msg = "";
-
-    if (pCount === 3) {
-        // සති 3ක් ආපු අයට යන ඔයා ඉල්ලපු විශේෂ පණිවිඩය
-        msg = `ආයුබෝවන්,\nඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති 3ක් පන්තියට 🧑‍🏫සහභාගී වී ඇත. කරුණාකර ලබන සතියේ පන්ති ගාස්තු 💵පියවීමට කටයුතු කරන්න.\nස්තූතියි!🙏`;
-    } else if (pCount === 4) {
-        // සති 4ම ආපු අයට යන පණිවිඩය (ගාස්තු මතක් කිරීමක් ලෙස)
-        msg = `ආයුබෝවන්,\nඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති 4ම 🧑‍🏫සහභාගී වී ඇත. කරුණාකර පන්ති ගාස්තු 💵පියවීමට කටයුතු කරන්න.\nස්තූතියි!🙏`;
-    } else {
-        // සති 1ක් හෝ 2ක් ආපු අයට යන සාමාන්‍ය Report එක
-        msg = `*පැමිණීමේ වාර්තාව - ${currentMonth}*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nපැමිණීම: සති ${pCount}/4 කි. ✅\n\nස්තූතියි!`;
-    }
-
-    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-}
-}
+// නව සිසුවෙකු ඇතුළත් කිරීම
 function addStudent() {
     let n = document.getElementById("studentName").value;
     let p = document.getElementById("parentPhone").value;
@@ -151,6 +158,8 @@ function addStudent() {
         document.getElementById("studentName").value = ""; document.getElementById("parentPhone").value = "";
     }
 }
+
+// ඉවත් කිරීම සහ අනෙකුත්
 function del(idx) { if(confirm("Delete student?")) { students.splice(idx,1); saveData(); renderStudents(); } }
 function logout() { localStorage.removeItem("loggedIn"); location.reload(); }
 function changeMonth() { currentMonth = document.getElementById("monthSelect").value; renderStudents(); }
