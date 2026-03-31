@@ -58,54 +58,78 @@ function renderStudents() {
         let card = document.createElement("div");
         card.className = "student-card";
         card.innerHTML = `
-            <h3 style="margin:0;">${s.name}</h3>
-            <span style="font-size:11px; color:#666;">${s.group}</span>
-            <div class="attendance-box">
-                ${s.attendance[currentMonth].map((v, i) => `<div class="att-day">W${i+1}<br><button class="att-btn ${v=='P'?'present':v=='A'?'absent':''}" onclick="markAtt(${idx},${i})">${v}</button></div>`).join('')}
-                <div class="att-day">මුළු පැමිණීම<br><b style="font-size:16px;">${pCount}</b></div>
+            <div id="view-${idx}">
+                <h3 style="margin:0;">${s.name}</h3>
+                <span style="font-size:11px; color:#2c3e50; font-weight:bold;">${s.group}</span> | 
+                <span style="font-size:11px; color:#666;">${s.phone}</span>
+                <div class="attendance-box">
+                    ${s.attendance[currentMonth].map((v, i) => `<div class="att-day">W${i+1}<br><button class="att-btn ${v=='P'?'present':v=='A'?'absent':''}" onclick="markAtt(${idx},${i})">${v}</button></div>`).join('')}
+                    <div class="att-day">මුළු පැමිණීම<br><b style="font-size:16px;">${pCount}</b></div>
+                </div>
+                <div class="card-actions">
+                    <button class="pay-btn" onclick="pay(${idx})">${s.fees?.[currentMonth]==='Paid'?'Paid ✅':'Pay Rs.'+(feesList[s.group]||'')}</button>
+                    <button class="wa-btn" onclick="sendReceipt(${idx})">💵 Receipt</button>
+                    <button class="rep-btn" onclick="sendReport(${idx})">📊 Report</button>
+                    <button class="edit-btn-small" onclick="toggleEdit(${idx})">📝 Edit</button>
+                    <button class="del-btn" onclick="del(${idx})">🗑️ Remove</button>
+                </div>
             </div>
-            <div class="card-actions">
-                <button class="pay-btn" onclick="pay(${idx})">${s.fees?.[currentMonth]==='Paid'?'Paid ✅':'Pay Rs.'+(feesList[s.group]||'')}</button>
-                <button class="wa-btn" onclick="sendReceipt(${idx})">💵 Receipt</button>
-                <button class="rep-btn" onclick="sendReport(${idx})">📊 Attendance</button>
-                <button class="del-btn" onclick="del(${idx})">🗑️ Remove Student</button>
+            <div id="edit-${idx}" style="display:none;">
+                <input type="text" id="editName-${idx}" value="${s.name}">
+                <input type="text" id="editPhone-${idx}" value="${s.phone}">
+                <select id="editGroup-${idx}">
+                    ${Object.keys(feesList).map(g => `<option value="${g}" ${g===s.group?'selected':''}>${g}</option>`).join('')}
+                </select>
+                <div style="display:flex; gap:5px;">
+                    <button onclick="updateStudent(${idx})" style="background:var(--accent);">Update</button>
+                    <button onclick="toggleEdit(${idx})" style="background:#95a5a6;">Cancel</button>
+                </div>
             </div>
         `;
         list.appendChild(card);
     });
 }
 
+function toggleEdit(idx) {
+    const v = document.getElementById(`view-${idx}`);
+    const e = document.getElementById(`edit-${idx}`);
+    v.style.display = v.style.display === 'none' ? 'block' : 'none';
+    e.style.display = e.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateStudent(idx) {
+    students[idx].name = document.getElementById(`editName-${idx}`).value;
+    students[idx].phone = document.getElementById(`editPhone-${idx}`).value;
+    students[idx].group = document.getElementById(`editGroup-${idx}`).value;
+    saveData();
+    renderStudents();
+}
+
+// --- පරණ Functions (markAtt, pay, sendReceipt, sendReport, addStudent, del, logout) එහෙම්මම තියන්න ---
 function markAtt(idx, w) {
     let cur = students[idx].attendance[currentMonth][w];
     students[idx].attendance[currentMonth][w] = cur === "P" ? "A" : cur === "A" ? "-" : "P";
     saveData(); renderStudents();
 }
-
 function pay(idx) {
     if(!students[idx].fees) students[idx].fees = {};
     students[idx].fees[currentMonth] = (students[idx].fees[currentMonth] === "Paid") ? "Pending" : "Paid";
     saveData(); renderStudents();
 }
-
 function sendReceipt(idx) {
     let s = students[idx];
     let amt = feesList[s.group];
     let msg = `*Payment Receipt - Boss Thilina*\n\nStudent: ${s.name}\nClass: ${s.group}\nMonth: ${currentMonth}\nAmount: Rs.${amt}\nStatus: PAID ✅\n\nස්තූතියි!`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
-
 function sendReport(idx) {
     let s = students[idx];
     let pCount = s.attendance[currentMonth].filter(x => x === "P").length;
-    let msg = "";
-    if (pCount >= 3) {
-        msg = `*Attendance Report - Boss Thilina*\n\nආයුබෝවන්, ඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති ${pCount}ක් පන්තියට සහභාගී වී ඇත. කරුණාකර පන්ති ගාස්තු පියවීමට කටයුතු කරන්න. ස්තූතියි!`;
-    } else {
-        msg = `*Student Report - Boss Thilina*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nමාසය: ${currentMonth}\nපැමිණීම: සති ${pCount}/4 කි.\n\nස්තූතියි!`;
-    }
+    let msg = (pCount >= 3) ? 
+        `*Attendance Report - Boss Thilina*\n\nආයුබෝවන්, ඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති ${pCount}ක් පන්තියට සහභාගී වී ඇත. කරුණාකර පන්ති ගාස්තු පියවීමට කටයුතු කරන්න. ස්තූතියි!` :
+        `*Student Report - Boss Thilina*\n\nදරුවාගේ නම: ${s.name}\nපන්තිය: ${s.group}\nමාසය: ${currentMonth}\nපැමිණීම: සති ${pCount}/4 කි.\n\nස්තූතියි!`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
-
 function addStudent() {
     let n = document.getElementById("studentName").value;
     let p = document.getElementById("parentPhone").value;
@@ -116,7 +140,6 @@ function addStudent() {
         document.getElementById("studentName").value = ""; document.getElementById("parentPhone").value = "";
     }
 }
-
 function del(idx) { if(confirm("Delete student?")) { students.splice(idx,1); saveData(); renderStudents(); } }
 function logout() { localStorage.removeItem("loggedIn"); location.reload(); }
 function changeMonth() { currentMonth = document.getElementById("monthSelect").value; renderStudents(); }
