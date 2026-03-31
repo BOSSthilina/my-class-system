@@ -19,3 +19,11 @@ button { background: var(--primary); color: white; border: none; padding: 10px; 
 .wa-btn { background: #25D366; font-size: 11px; }
 .del-btn { background: #95a5a6; font-size: 11px; }
 .rank-badge { position: absolute; top: 10px; right: 10px; background: gold; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+.edit-btn-small {
+    background: #7f8c8d !important;
+    font-size: 11px !important;
+    padding: 5px !important;
+}
+#edit-student-box input, #edit-student-box select {
+    margin-bottom: 5px;
+}
