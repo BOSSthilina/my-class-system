@@ -128,7 +128,7 @@ function sendReport(idx) {
         msg = `ආයුබෝවන්,\nඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති 3ක් පන්තියට 🧑‍🏫සහභාගී වී ඇත.\n\n🏆 Your Child's Score: ${currentMark}\n📊 Class Rank: ${rank}\n\nකරුණාකර ලබන සතියේ පන්ති ගාස්තු 💵පියවීමට කටයුතු කරන්න.\nස්තූතියි!🙏\n- Thilina Bandara -`;
     } else {
         // අනෙක් වෙලාවට යන Rank රිපෝට් එක
-        msg = `Student: ${s.name}\nGrade: ${s.group}\n--------------------------\n🏆 Your Child's Score: ${currentMark}\n📊 Class Rank: ${rank}\n\n🔥 Class Performance (${s.group}):\n- 🥇 1st Place: ${first}\n- 🥈 2nd Place: ${second}\n- 🥉 3rd Place: ${third}\n--------------------------\nStatus: ${status}\n\nThank you! 🙏\n- Thilina Bandara -`;
+        msg = `Student: ${s.name}\nGrade: ${s.group}\n--------------------------\n🏆 Your Child's Score: ${currentMark}\n📊 Class Rank: ${rank}\n\n🔥 Class Performance (${s.group}):\n- 🥇 1st Place: ${first}\n- 🥈 2nd Place: ${second}\n- 🥉 3rd Place: ${third}\n--------------------------\nStatus: ${status}\n\nThank you! 🤝\n- Thilina Bandara -`;
     }
 
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
