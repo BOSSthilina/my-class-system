@@ -106,9 +106,10 @@ function updateMarks(idx, val) {
 
 function sendReport(idx) {
     let s = students[idx];
+    let pCount = s.attendance[currentMonth].filter(x => x === "P").length;
     let currentMark = parseFloat(s.marks[currentMonth]) || 0;
 
-    // Rank එක හදන Logic එක
+    // Rank Logic
     let groupStudents = students.filter(std => std.group === s.group);
     let marksList = groupStudents
         .map(std => parseFloat(std.marks[currentMonth]) || 0)
@@ -120,8 +121,15 @@ function sendReport(idx) {
     let third = marksList[2] || 0;
     let status = (s.fees && s.fees[currentMonth] === "Paid") ? "Paid ✅" : "Pending ⏳";
 
-    // ඔයා ඉල්ලපු අලුත් පණිවිඩය
-    let msg = `Student: ${s.name}\nGrade: ${s.group}\n--------------------------\n🏆 Your Child's Score: ${currentMark}\n📊 Class Rank: ${rank}\n\n🔥 Class Performance (${s.group}):\n- 🥇 1st Place: ${first}\n- 🥈 2nd Place: ${second}\n- 🥉 3rd Place: ${third}\n--------------------------\nStatus: ${status}\n\nThank you! 🙏\n- Thilina Bandara -`;
+    let msg = "";
+
+    if (pCount === 3) {
+        // සති 3ක් ආවම යන විශේෂ සිංහල මැසේජ් එක
+        msg = `ආයුබෝවන්,\nඔබගේ දරුවා වන ${s.name}, ${currentMonth} මාසය සඳහා සති 3ක් පන්තියට 🧑‍🏫සහභාගී වී ඇත.\n\n🏆 Your Child's Score: ${currentMark}\n📊 Class Rank: ${rank}\n\nකරුණාකර ලබන සතියේ පන්ති ගාස්තු 💵පියවීමට කටයුතු කරන්න.\nස්තූතියි!🙏\n- Thilina Bandara -`;
+    } else {
+        // අනෙක් වෙලාවට යන Rank රිපෝට් එක
+        msg = `Student: ${s.name}\nGrade: ${s.group}\n--------------------------\n🏆 Your Child's Score: ${currentMark}\n📊 Class Rank: ${rank}\n\n🔥 Class Performance (${s.group}):\n- 🥇 1st Place: ${first}\n- 🥈 2nd Place: ${second}\n- 🥉 3rd Place: ${third}\n--------------------------\nStatus: ${status}\n\nThank you! 🙏\n- Thilina Bandara -`;
+    }
 
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
@@ -141,7 +149,7 @@ function pay(idx) {
 function sendReceipt(idx) {
     let s = students[idx];
     let amt = feesList[s.group];
-    let msg = `*Payment Receipt - Thilina Bandara*\n\nStudent: ${s.name}\nAmount: Rs.${amt}\nMonth: ${currentMonth}\nStatus: PAID ✅\n\nThank you!`;
+    let msg = `*Payment Receipt - Thilina Bandara*\n\nStudent: ${s.name}\nAmount: Rs.${amt}\nMonth: ${currentMonth}\nStatus: PAID ✅\n\nThank you! 🙏`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
