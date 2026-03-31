@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management Simplified</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <div id="loginBox">
+        <div class="login-card">
+            <h2>Admin Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button class="login-btn" onclick="login()">Login</button>
+        </div>
+    </div>
+
+    <div id="mainContent" style="display:none;">
+        <div class="header">
+            <h2>Student Dashboard</h2>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="form-section">
+            <div class="input-group">
+                <input type="text" id="studentName" placeholder="Student Name">
+                <input type="text" id="parentPhone" placeholder="Phone (947XXXXXXXX)">
+                <select id="group">
+                    <option value="Grade 6">Grade 6</option>
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 9">Grade 9</option>
+                    <option value="Grade 10">Grade 10</option>
+                    <option value="Grade 11">Grade 11</option>
+                </select>
+                <button class="add-btn" onclick="addStudent()">+ Add Student</button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="control-item">
+                <label>Month:</label>
+                <select id="monthSelect" onchange="changeMonth()">
+                <option value="January">January</option>
+                <option value="February">February</option>
+                <option value="March" selected>March</option>
+                <option value="April">April</option>
+                <option value="May">May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October">October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
+                </select>
+            </div>
+            <div class="control-item">
+                <label>Filter:</label>
+                <select id="filterGroup" onchange="renderStudents()">
+                    <option value="All">All Grades</option>
+                    <option value="Grade 6">Grade 6</option>
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 9">Grade 9</option>
+                    <option value="Grade 10">Grade 10</option>
+                    <option value="Grade 11">Grade 11</option>
+                </select>
+            </div>
+            <button class="bulk-btn" onclick="sendAllReports()">📤 Send Bulk Marks Reports</button>
+        </div>
+
+        <div id="studentList" class="student-grid"></div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
