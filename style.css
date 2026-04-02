@@ -3,7 +3,7 @@ body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padd
 input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
 button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
 .student-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 6px solid #007bff; position: relative; }
-.att-btn { padding: 8px 12px; margin: 4px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; }
+.att-btn { padding: 8px 12px; margin: 4px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; min-width: 45px; }
 .present { background: #28a745; color: white; }
 .absent { background: #dc3545; color: white; }
 .wa-btn { background: #25D366; color: white; margin-top: 10px; }
