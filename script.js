@@ -156,15 +156,30 @@ function editStudent(idx) {
 function addOrUpdateStudent() {
     let name = document.getElementById("studentName").value;
     let phone = document.getElementById("parentPhone").value;
+    let grade = document.getElementById("studentGrade").value; // Grade එක ගන්නවා
     let group = document.getElementById("group").value;
     let fee = document.getElementById("monthlyFee").value;
     let editIdx = document.getElementById("editIdx").value;
 
+    if(name === "" || phone === "") { alert("සම්පූර්ණ විස්තර ඇතුළත් කරන්න"); return; }
+
     if(editIdx === "") {
-        students.push({ name, phone, group, fee, marks: {}, attendance: {}, fees: {} });
+        students.push({ name, phone, grade, group, fee, marks: {}, attendance: {}, fees: {} });
     } else {
-        students[editIdx] = { ...students[editIdx], name, phone, group, fee };
+        // පරණ දත්ත වලට grade එක එකතු කරනවා
+        students[editIdx].name = name;
+        students[editIdx].phone = phone;
+        students[editIdx].grade = grade;
+        students[editIdx].group = group;
+        students[editIdx].fee = fee;
         document.getElementById("editIdx").value = "";
+        document.getElementById("formTitle").innerText = "+ Add Student";
     }
-    saveData(); renderStudents();
+    saveData(); 
+    renderStudents();
+    
+    // ලිස්ට් එක හිස් කරනවා
+    document.getElementById("studentName").value = "";
+    document.getElementById("parentPhone").value = "";
+    document.getElementById("monthlyFee").value = "";
 }
