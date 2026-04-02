@@ -27,7 +27,7 @@ function addOrUpdateStudent() {
     let editIdx = document.getElementById("editIdx").value;
 
     if(editIdx === "") {
-        students.push({ name, phone, group, fee, marks: {}, attendance: {} });
+        students.push({ name, phone, group, fee, marks: {}, attendance: {}, fees: {} });
     } else {
         students[editIdx].name = name;
         students[editIdx].phone = phone;
@@ -39,6 +39,7 @@ function addOrUpdateStudent() {
     saveData(); renderStudents();
     document.getElementById("studentName").value = "";
     document.getElementById("parentPhone").value = "";
+    document.getElementById("monthlyFee").value = "";
 }
 
 function editStudent(idx) {
@@ -60,8 +61,8 @@ function renderStudents() {
 
     students.filter(s => s.name.toLowerCase().includes(search)).forEach((s, idx) => {
         let sIdx = students.indexOf(s);
+        if(!s.attendance) s.attendance = {};
         if(!s.attendance[month]) s.attendance[month] = ["-","-","-","-"];
-        let attCount = s.attendance[month].filter(a => a === "P").length;
         let score = s.marks?.[month] || 0;
 
         let card = document.createElement("div");
@@ -85,6 +86,9 @@ function renderStudents() {
         `;
         list.appendChild(card);
     });
+
+    // මෙන්න මේ පේළිය අනිවාර්යයෙන් තියෙන්න ඕනේ Pending List එක වැටෙන්න
+    updatePendingList(); 
 }
 
 function mark(sIdx, month, wIdx) {
@@ -113,8 +117,50 @@ function sendFeeReminder(idx, month) {
 
 function sendThanks(idx, month) {
     let s = students[idx];
+    // සල්ලි ගෙවපු ගමන් මේ ළමයව Pending ලිස්ට් එකෙන් අයින් වෙන්න "Paid" කියලා මාර්ක් කරනවා
+    if(!s.fees) s.fees = {};
+    s.fees[month] = "Paid";
+    saveData();
+
     let msg = `දරුවාගේ (${s.name}) ${month} මස සඳහා රු. ${s.fee} ක ගාස්තුව ලැබුණි. ස්තූතියි!`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
+    renderStudents();
+}
+
+function updatePendingList() {
+    let month = document.getElementById("monthSelect").value;
+    let display = document.getElementById("pendingDisplay");
+    if(!display) return;
+    display.innerHTML = "";
+
+    let groups = [...new Set(students.map(s => s.group))];
+
+    groups.forEach(groupName => {
+        let unpaid = students.filter(s => s.group === groupName && (!s.fees || s.fees[month] !== "Paid"));
+
+        if (unpaid.length > 0) {
+            let groupDiv = document.createElement("div");
+            groupDiv.style.borderBottom = "1px solid #eee";
+            groupDiv.style.padding = "10px 0";
+            
+            let namesList = unpaid.map((s, i) => `${i+1}. ${s.name}`).join("\n");
+            let waMsg = `*${groupName} - ${month} මාසය සඳහා ගාස්තු ගෙවීමට ඇති සිසුන්:*\n\n${namesList}\n\nකරුණාකර හැකි ඉක්මනින් ගාස්තු පියවීමට කටයුතු කරන්න. ස්තූතියි!`;
+
+            groupDiv.innerHTML = `
+                <strong style="color:#e67e22;">${groupName} (${unpaid.length} students)</strong>
+                <pre style="font-size:12px; background:#f9f9f9; padding:10px; border-radius:8px; white-space: pre-wrap; font-family: inherit;">${namesList}</pre>
+                <button onclick="copyToClipboard('${encodeURIComponent(waMsg)}')" style="background:#2ecc71; font-size:12px; padding:8px; width: auto; color:white; border:none; border-radius:5px; cursor:pointer;">Copy Message for WhatsApp</button>
+            `;
+            display.appendChild(groupDiv);
+        }
+    });
+}
+
+function copyToClipboard(encodedMsg) {
+    let msg = decodeURIComponent(encodedMsg);
+    navigator.clipboard.writeText(msg).then(() => {
+        alert("ලිස්ට් එක Copy වුණා! දැන් WhatsApp Group එකට පේස්ට් (Paste) කරන්න.");
+    });
 }
 
 function del(idx) { if(confirm("Delete?")) { students.splice(idx,1); saveData(); renderStudents(); } }
