@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Manager Dashboard</title>
+    <title>Class Manager Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,11 +16,10 @@
 
     <div id="mainContent" style="display:none;">
         <div class="card">
-            <h3>+ Add Student</h3>
+            <h3 id="formTitle">+ Add Student</h3>
+            <input type="hidden" id="editIdx">
             <input type="text" id="studentName" placeholder="Student Name">
             <input type="text" id="parentPhone" placeholder="947XXXXXXXX">
-            
-            <label>Select Group / Class:</label>
             <select id="group">
                 <option value="Grade 8 Tuesday 3:00-5:00">Grade 8 Tuesday 3:00-5:00</option>
                 <option value="Grade 7 Saturday 11:00-1:00">Grade 7 Saturday 11:00-1:00</option>
@@ -29,13 +28,10 @@
                 <option value="Grade 9 Maths Sunday 8:30-10:30">Grade 9 Maths Sunday 8:30-10:30</option>
                 <option value="Grade 10 Thursday 3:00-5:00">Grade 10 Thursday 3:00-5:00</option>
                 <option value="Grade 6 New">Grade 6 New</option>
-                <option value="Grade 9 Maths Saturday 2:30-4:30">Grade 9 Maths Saturday 2:30-4:30</option>
-                <option value="Grade 9 Monday 5:30-7:30">Grade 9 Monday 5:30-7:30</option>
-                <option value="Individual Class">Individual Class (තනි පන්ති)</option>
+                <option value="Individual Class">Individual Class</option>
             </select>
-
-            <input type="number" id="monthlyFee" placeholder="Monthly Fee (Individual අයට විතරක්)">
-            <button onclick="addStudent()">Add Student</button>
+            <input type="number" id="monthlyFee" placeholder="Monthly Fee (Rs.)">
+            <button id="saveBtn" onclick="addOrUpdateStudent()">Save Student</button>
         </div>
 
         <div class="card">
@@ -54,10 +50,6 @@
                     <option value="October">October</option>
                     <option value="November">November</option>
                     <option value="December">December</option>
-                </select>
-                <select id="filterGroup" onchange="renderStudents()">
-                    <option value="All">All Classes</option>
-                    <option value="Individual Class">Individual Only</option>
                 </select>
             </div>
         </div>
