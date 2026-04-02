@@ -1,9 +1,147 @@
-body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
-.card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
-.student-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 6px solid #007bff; position: relative; }
-.att-btn { padding: 8px 12px; margin: 4px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; min-width: 45px; }
-.present { background: #28a745; color: white; }
-.absent { background: #dc3545; color: white; }
-.wa-btn { background: #25D366; color: white; margin-top: 10px; }
+/* --- Global Styles --- */
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background-color: #f4f7f9; 
+    margin: 0; 
+    padding: 15px; 
+    color: #333;
+}
+
+.container { 
+    max-width: 900px; 
+    margin: auto; 
+}
+
+/* --- Card Style --- */
+.card { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 15px; 
+    margin-bottom: 20px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+}
+
+h2, h3 { 
+    margin-top: 0; 
+    color: #2c3e50; 
+}
+
+/* --- Inputs & Buttons --- */
+input, select { 
+    width: 100%; 
+    padding: 12px; 
+    margin: 8px 0; 
+    border: 1px solid #ddd; 
+    border-radius: 10px; 
+    box-sizing: border-box; 
+    font-size: 14px;
+}
+
+button { 
+    width: 100%; 
+    padding: 12px; 
+    background-color: #3498db; 
+    color: white; 
+    border: none; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    font-size: 15px; 
+    transition: 0.3s;
+}
+
+button:hover { 
+    background-color: #2980b9; 
+}
+
+/* --- Student Card Design --- */
+.student-card { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 15px; 
+    margin-bottom: 15px; 
+    border-left: 8px solid #3498db; 
+    box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+}
+
+.student-card h3 { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 5px;
+}
+
+.student-card small { 
+    color: #7f8c8d; 
+    display: block; 
+    margin-bottom: 10px;
+}
+
+/* --- Attendance Buttons --- */
+.att-btn { 
+    width: 45px; 
+    height: 45px; 
+    padding: 0; 
+    margin-right: 8px; 
+    border-radius: 8px; 
+    border: 1px solid #ddd; 
+    background: #f9f9f9; 
+    color: #333; 
+    font-weight: bold;
+}
+
+.present { background-color: #27ae60 !important; color: white !important; border: none; }
+.absent { background-color: #e74c3c !important; color: white !important; border: none; }
+
+/* --- WhatsApp & Action Buttons --- */
+.wa-btn { 
+    background-color: #25D366; 
+    margin-top: 8px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 8px;
+}
+
+.wa-btn:hover { background-color: #1ebd59; }
+
+/* --- Marks Section --- */
+.marks-row {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+    align-items: center;
+}
+
+.marks-row input {
+    flex: 1;
+    margin: 0;
+}
+
+.marks-row button {
+    flex: 1;
+    margin: 0;
+    background-color: #2c3e50;
+    font-size: 13px;
+}
+
+/* --- Login Box Center --- */
+#loginBox {
+    max-width: 350px;
+    margin: 100px auto;
+    text-align: center;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 600px) {
+    .att-btn {
+        width: 40px;
+        height: 40px;
+        margin-right: 5px;
+    }
+    
+    button {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
