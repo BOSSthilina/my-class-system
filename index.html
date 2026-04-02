@@ -1,83 +1,93 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thilina Bandara - Class Management</title>
+    <title>Smart Class Manager Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="loginBox" class="login-container">
-        <h2>Thilina Bandara Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
+
+<div class="container">
+    <div id="loginBox">
+        <div class="login-card">
+            <h2>Admin Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button class="login-btn" onclick="login()">Login</button>
+        </div>
     </div>
 
     <div id="mainContent" style="display:none;">
-        <header>
-            <h2>Thilina Bandara Dashboard</h2>
+        <div class="header">
+            <h2>Class Manager Dashboard</h2>
             <button class="logout-btn" onclick="logout()">Logout</button>
-        </header>
-
-        <div class="stats-grid">
-            <div class="stat-card">මුළු ළමයි: <span id="totalCount">0</span></div>
-            <div class="stat-card">අද පැමිණීම: <span id="todayAtt">0</span></div>
-            <div class="stat-card">ගෙවා ඇත: <span id="paidCount">0</span></div>
         </div>
 
-        <div class="controls">
-            <input type="text" id="searchInput" placeholder="🔍 නමෙන් සොයන්න..." onkeyup="renderStudents()">
-            <select id="filterGroup" onchange="renderStudents()">
-                <option value="All">සියලුම පන්ති</option>
-                <option value="Grade 6 Friday">Grade 6 Friday (1000)</option>
-                <option value="Grade 7 Saturday">Grade 7 Saturday (1000)</option>
-                <option value="Grade 8 Sunday">Grade 8 Sunday (2000)</option>
-                <option value="Grade 8 Monday">Grade 8 Monday (1000)</option>
-                <option value="Grade 8 Tuesday">Grade 8 Tuesday (1000)</option>
-                <option value="Grade 9 Saturday">Grade 9 Saturday (2000)</option>
-                <option value="Grade 9 Sunday">Grade 9 Sunday (2000)</option>
-                <option value="Grade 9 Monday">Grade 9 Monday (1500)</option>
-                <option value="Grade 10 Wednesday">Grade 10 Wednesday (1500)</option>
-                <option value="Grade 10 Thursday">Grade 10 Thursday (2000)</option>
-                <option value="Grade 10 Sunday Paper">Grade 10 Sunday Paper</option>
-                <option value="Grade 11 Saturday">Grade 11 Saturday (2000)</option>
-                <option value="Grade 11 Friday Paper">Grade 11 Friday Paper</option>
-            </select>
-            <select id="monthSelect" onchange="changeMonth()">
-                <option value="January">January</option><option value="February">February</option>
-                <option value="March" selected>March</option><option value="April">April</option>
-                <option value="May">May</option><option value="June">June</option>
-                <option value="July">July</option><option value="August">August</option>
-                <option value="September">September</option><option value="October">October</option>
-                <option value="November">November</option><option value="December">December</option>
-            </select>
+        <div class="form-section">
+            <h3>+ Add New Student</h3>
+            <div class="input-grid">
+                <input type="text" id="studentName" placeholder="Student Name">
+                <input type="text" id="parentPhone" placeholder="Phone (947XXXXXXXX)">
+                
+                <select id="classType">
+                    <option value="Group">Group Class</option>
+                    <option value="Individual">Individual Class</option>
+                </select>
+
+                <select id="group">
+                    <option value="Grade 6">Grade 6</option>
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 9">Grade 9</option>
+                    <option value="Grade 10">Grade 10</option>
+                    <option value="Grade 11">Grade 11</option>
+                    <option value="Revision">Revision</option>
+                </select>
+
+                <input type="number" id="monthlyFee" placeholder="Monthly Fee (Rs.)">
+                <button class="add-btn" onclick="addStudent()">Add Student</button>
+            </div>
         </div>
 
-        <div class="add-student">
-            <h3>නව සිසුවෙකු ඇතුළත් කරන්න</h3>
-            <input type="text" id="studentName" placeholder="සිසුවාගේ නම">
-            <input type="text" id="parentPhone" placeholder="WhatsApp අංකය (9477... )">
-            <select id="newStudentGroup">
-                <option value="Grade 6 Friday">Grade 6 Friday</option>
-                <option value="Grade 7 Saturday">Grade 7 Saturday</option>
-                <option value="Grade 8 Sunday">Grade 8 Sunday</option>
-                <option value="Grade 8 Monday">Grade 8 Monday</option>
-                <option value="Grade 8 Tuesday">Grade 8 Tuesday</option>
-                <option value="Grade 9 Saturday">Grade 9 Saturday</option>
-                <option value="Grade 9 Sunday">Grade 9 Sunday</option>
-                <option value="Grade 9 Monday">Grade 9 Monday</option>
-                <option value="Grade 10 Wednesday">Grade 10 Wednesday</option>
-                <option value="Grade 10 Thursday">Grade 10 Thursday</option>
-                <option value="Grade 10 Sunday Paper">Grade 10 Sunday Paper</option>
-                <option value="Grade 11 Saturday">Grade 11 Saturday</option>
-                <option value="Grade 11 Friday Paper">Grade 11 Friday Paper</option>
-            </select>
-            <button onclick="addStudent()">සිසුවා ඇතුළත් කරන්න</button>
+        <div class="controls-section">
+            <input type="text" id="searchBar" placeholder="🔍 Search student name..." onkeyup="renderStudents()">
+            
+            <div class="filter-group">
+                <select id="monthSelect" onchange="renderStudents()">
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March" selected>March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+
+                <select id="filterGrade" onchange="renderStudents()">
+                    <option value="All">All Grades (සියලුම ශ්‍රේණි)</option>
+                    <option value="Grade 6">Grade 6</option>
+                    <option value="Grade 10">Grade 10</option>
+                    <option value="Grade 11">Grade 11</option>
+                </select>
+
+                <select id="filterType" onchange="renderStudents()">
+                    <option value="All">All Types (Group & Ind.)</option>
+                    <option value="Group">Group Only</option>
+                    <option value="Individual">Individual Only</option>
+                </select>
+            </div>
         </div>
 
-        <div id="studentList"></div>
+        <div id="studentList" class="student-grid"></div>
     </div>
-    <script src="script.js"></script>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
