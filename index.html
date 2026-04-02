@@ -34,7 +34,7 @@
                 <option value="Individual Class">Individual Class (තනි පන්ති)</option>
             </select>
 
-            <input type="number" id="monthlyFee" placeholder="Monthly Fee (Rs.) - Individual අයට විතරක්">
+            <input type="number" id="monthlyFee" placeholder="Monthly Fee (Individual අයට විතරක්)">
             <button onclick="addStudent()">Add Student</button>
         </div>
 
@@ -42,8 +42,18 @@
             <input type="text" id="searchBar" placeholder="🔍 Search Name..." onkeyup="renderStudents()">
             <div style="display: flex; gap: 10px; margin-top: 10px;">
                 <select id="monthSelect" onchange="renderStudents()">
+                    <option value="January">January</option>
+                    <option value="February">February</option>
                     <option value="March" selected>March</option>
                     <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
                 </select>
                 <select id="filterGroup" onchange="renderStudents()">
                     <option value="All">All Classes</option>
