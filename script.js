@@ -28,10 +28,11 @@ function addStudent() {
     let fee = document.getElementById("monthlyFee").value || "0";
 
     if(name && phone) {
-        students.push({ name, phone, group, fee, marks: {}, attendance: {}, fees: {} });
+        students.push({ name, phone, group, fee, marks: {}, attendance: {} });
         saveData(); renderStudents();
         document.getElementById("studentName").value = "";
         document.getElementById("parentPhone").value = "";
+        document.getElementById("monthlyFee").value = "";
     }
 }
 
@@ -44,6 +45,7 @@ function renderStudents() {
 
     students.filter(s => (filter === "All" || s.group === filter) && s.name.toLowerCase().includes(search)).forEach((s, idx) => {
         let sIdx = students.indexOf(s);
+        if(!s.attendance) s.attendance = {};
         if(!s.attendance[month]) s.attendance[month] = ["-","-","-","-"];
         
         let card = document.createElement("div");
@@ -55,6 +57,7 @@ function renderStudents() {
                 ${s.attendance[month].map((a, i) => `<button class="att-btn ${a==='P'?'present':a==='A'?'absent':''}" onclick="mark(${sIdx},'${month}',${i})">${a}</button>`).join('')}
             </div>
             <button class="wa-btn" onclick="sendWA(${sIdx}, '${month}')">📱 Send WhatsApp Report</button>
+            <button onclick="del(${sIdx})" style="background:none; border:none; color:red; font-size:11px; margin-top:10px; cursor:pointer;">Remove</button>
         `;
         list.appendChild(card);
     });
@@ -66,9 +69,11 @@ function mark(sIdx, month, wIdx) {
     saveData(); renderStudents();
 }
 
+function del(idx) { if(confirm("Delete?")) { students.splice(idx,1); saveData(); renderStudents(); } }
+
 function sendWA(sIdx, month) {
     let s = students[sIdx];
     let att = s.attendance[month].filter(a => a === "P").length;
-    let msg = `*Report - ${month}*\nStudent: ${s.name}\nClass: ${s.group}\nAttendance: ${att}/4\nFee: Rs.${s.fee}`;
+    let msg = `*Progress Report - ${month}*\nStudent: ${s.name}\nClass: ${s.group}\nAttendance: ${att}/4\nFee: Rs.${s.fee}`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
