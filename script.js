@@ -45,7 +45,7 @@ function renderStudents() {
         card.style.borderLeft = isPaid ? "8px solid #27ae60" : "8px solid #e74c3c";
         
         card.innerHTML = `
-            <h3>#${rank} - ${s.name} <span style="font-size:12px; color:#3498db;">(${s.grade || 'N/A'})</span></h3>  <-- මෙන්න මේ පේළිය තමයි අයින් කරන්න ඕනේ!
+            <h3>#${rank} - ${s.name} <span style="font-size:12px; color:#3498db;">(${s.grade || 'N/A'})</span></h3>  
             <small>${s.group} | Fee: Rs.${s.fee}</small>
             
             <div style="margin:10px 0;">
@@ -117,8 +117,7 @@ function sendProgress(idx, month, rank) {
               `- 🥈 2nd Place: ${second}\n` +
               `- 🥉 3rd Place: ${third}\n` +
               `--------------------------\n` +
-              `Attendance: ${att}/4\n` +
-              `Status: ${paidStatus}\n\n` +
+              
               `Thank you!`;
 
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
