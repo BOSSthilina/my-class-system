@@ -19,65 +19,55 @@ function login() {
     }
 }
 
-function addOrUpdateStudent() {
-    let name = document.getElementById("studentName").value;
-    let phone = document.getElementById("parentPhone").value;
-    let group = document.getElementById("group").value;
-    let fee = document.getElementById("monthlyFee").value || "0";
-    let editIdx = document.getElementById("editIdx").value;
-
-    if(editIdx === "") {
-        students.push({ name, phone, group, fee, marks: {}, attendance: {}, fees: {} });
-    } else {
-        students[editIdx].name = name;
-        students[editIdx].phone = phone;
-        students[editIdx].group = group;
-        students[editIdx].fee = fee;
-        document.getElementById("editIdx").value = "";
-        document.getElementById("formTitle").innerText = "+ Add Student";
-    }
-    saveData(); renderStudents();
-    document.getElementById("studentName").value = "";
-    document.getElementById("parentPhone").value = "";
-    document.getElementById("monthlyFee").value = "";
-}
-
 function renderStudents() {
     let list = document.getElementById("studentList");
     let search = document.getElementById("searchBar").value.toLowerCase();
     let month = document.getElementById("monthSelect").value;
     list.innerHTML = "";
 
+    // රෑන්ක් එක හැදීම (ලකුණු අනුව වැඩිම කෙනාගේ සිට අඩුම කෙනාට)
+    let rankedStudents = [...students].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
+
     students.filter(s => s.name.toLowerCase().includes(search)).forEach((s, idx) => {
         let sIdx = students.indexOf(s);
+        let rank = rankedStudents.findIndex(rs => rs.name === s.name) + 1;
+        
         if(!s.attendance) s.attendance = {};
         if(!s.attendance[month]) s.attendance[month] = ["-","-","-","-"];
         if(!s.fees) s.fees = {};
-        
+        if(!s.marks) s.marks = {};
+
         let isPaid = s.fees[month] === "Paid";
-        let score = s.marks?.[month] || 0;
+        let score = s.marks[month] || 0;
 
         let card = document.createElement("div");
         card.className = "student-card";
         card.style.borderLeft = isPaid ? "8px solid #27ae60" : "8px solid #e74c3c";
         
         card.innerHTML = `
-            <h3>${s.name} <span style="font-size:12px; color:${isPaid?'#27ae60':'#e74c3c'}">${isPaid?'(Paid)':'(Unpaid)'}</span></h3>
+            <h3>#${rank} - ${s.name} <span style="font-size:12px;">Rank: ${rank}</span></h3>
             <small>${s.group} | Fee: Rs.${s.fee}</small>
             
             <div style="margin:10px 0;">
                 ${s.attendance[month].map((a, i) => `<button class="att-btn ${a==='P'?'present':a==='A'?'absent':''}" onclick="mark(${sIdx},'${month}',${i})">${a}</button>`).join('')}
             </div>
 
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <button onclick="togglePaid(${sIdx}, '${month}')" style="background:${isPaid?'#95a5a6':'#2ecc71'}; width:auto; padding:5px 15px;">
-                    ${isPaid ? 'Mark as Unpaid' : '✅ Mark as Paid'}
-                </button>
-                <button onclick="editStudent(${sIdx})" style="background:#34495e; width:auto; padding:5px 15px;">Edit</button>
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <input type="number" id="m-${sIdx}" value="${score}" placeholder="Marks" style="width:70px; margin:0; padding:5px;">
+                <button onclick="saveMarks(${sIdx}, '${month}')" style="background:#34495e; width:auto; padding:5px 10px; font-size:12px;">Add Marks</button>
             </div>
 
-            <button class="wa-btn" onclick="sendProgress(${sIdx}, '${month}')">📊 Send Progress Report</button>
-            <button onclick="del(${sIdx})" style="color:red; background:none; border:none; margin-top:10px; cursor:pointer; font-size:12px;">Remove Student</button>
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <button onclick="togglePaid(${sIdx}, '${month}')" style="background:${isPaid?'#95a5a6':'#2ecc71'}; font-size:12px; padding:8px;">
+                    ${isPaid ? 'Paid ✅' : 'Mark as Paid'}
+                </button>
+                
+                <button onclick="send3WeekRemind(${sIdx}, '${month}')" style="background:#f39c12; font-size:12px; padding:8px;">⚠️ 3-Week Remind</button>
+                
+                <button onclick="sendProgress(${sIdx}, '${month}', ${rank})" style="background:#3498db; font-size:12px; padding:8px;">📊 Send Rank</button>
+            </div>
+
+            <button onclick="editStudent(${sIdx})" style="background:none; color:gray; border:none; font-size:11px; cursor:pointer;">Edit Details</button>
         `;
         list.appendChild(card);
     });
@@ -85,13 +75,30 @@ function renderStudents() {
     updatePendingList();
 }
 
-function togglePaid(sIdx, month) {
-    if(!students[sIdx].fees) students[sIdx].fees = {};
-    students[sIdx].fees[month] = (students[sIdx].fees[month] === "Paid") ? "Unpaid" : "Paid";
+// ලකුණු සේව් කිරීම
+function saveMarks(sIdx, month) {
+    if(!students[sIdx].marks) students[sIdx].marks = {};
+    students[sIdx].marks[month] = document.getElementById(`m-${sIdx}`).value;
     saveData();
-    renderStudents();
+    renderStudents(); // රෑන්ක් එක අප්ඩේට් වෙන්න ආයේ රෙන්ඩර් කරනවා
 }
 
+// 3 Week Reminder මැසේජ් එක
+function send3WeekRemind(idx, month) {
+    let s = students[idx];
+    let msg = `ඔබගේ දරුවා (${s.name}) සති 3ක් පන්තියට පැමිණ නැත/ගාස්තු ගෙවා නැත. කරුණාකර ඒ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
+    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
+}
+
+// රෑන්ක් එකත් එක්ක ප්‍රගති වාර්තාව යැවීම
+function sendProgress(idx, month, rank) {
+    let s = students[idx];
+    let att = s.attendance[month].filter(a=>a==='P').length;
+    let msg = `*Progress Report - ${month}*\n\nStudent: ${s.name}\nClass Rank: No. ${rank}\nMarks: ${s.marks[month] || 0}\nAttendance: ${att}/4\nFees: ${(s.fees && s.fees[month] === "Paid") ? "Paid ✅" : "Pending"}\n\nKeep it up!`;
+    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
+}
+
+// සල්ලි ගෙවපු නැති අයගේ ලිස්ට් එක (Pending List)
 function updatePendingList() {
     let month = document.getElementById("monthSelect").value;
     let display = document.getElementById("pendingDisplay");
@@ -103,34 +110,37 @@ function updatePendingList() {
         let unpaid = students.filter(s => s.group === groupName && (!s.fees || s.fees[month] !== "Paid"));
 
         if (unpaid.length > 0) {
-            let groupDiv = document.createElement("div");
-            groupDiv.className = "card";
-            groupDiv.style.border = "1px solid #ddd";
-            
             let namesList = unpaid.map((s, i) => `${i+1}. ${s.name}`).join("\n");
-            let waMsg = `*${groupName} - ${month} මාසය සඳහා ගාස්තු ගෙවීමට ඇති සිසුන්:*\n\n${namesList}\n\nකරුණාකර හැකි ඉක්මනින් ගාස්තු පියවීමට කටයුතු කරන්න. ස්තූතියි!`;
+            let waMsg = `*${groupName} - ${month} පන්තියට ගාස්තු ගෙවීමට ඇති සිසුන්:*\n\n${namesList}\n\nකරුණාකර ගෙවීම් පියවන්න.`;
 
-            groupDiv.innerHTML = `
-                <strong style="color:#c0392b;">${groupName}</strong>
-                <pre style="background:#fdfefe; padding:8px; border-radius:5px; font-size:12px;">${namesList}</pre>
-                <button onclick="copyToClipboard('${encodeURIComponent(waMsg)}')" style="background:#25D366; color:white; padding:8px; border-radius:5px; border:none; width:100%;">Copy Group Message</button>
+            let div = document.createElement("div");
+            div.style.padding = "10px";
+            div.style.borderBottom = "1px solid #ddd";
+            div.innerHTML = `
+                <small><b>${groupName}</b></small>
+                <pre style="font-size:11px;">${namesList}</pre>
+                <button onclick="copyToClipboard('${encodeURIComponent(waMsg)}')" style="background:#25D366; font-size:11px; padding:5px;">Copy List</button>
             `;
-            display.appendChild(groupDiv);
+            display.appendChild(div);
         }
     });
 }
 
-function copyToClipboard(encodedMsg) {
-    let msg = decodeURIComponent(encodedMsg);
-    navigator.clipboard.writeText(msg).then(() => {
-        alert("ලිස්ට් එක Copy වුණා! දැන් WhatsApp Group එකට පේස්ට් කරන්න.");
-    });
+// අනිත් සාමාන්‍ය Functions (Edit, Delete, TogglePaid, Mark)
+function togglePaid(sIdx, month) {
+    if(!students[sIdx].fees) students[sIdx].fees = {};
+    students[sIdx].fees[month] = (students[sIdx].fees[month] === "Paid") ? "Unpaid" : "Paid";
+    saveData(); renderStudents();
 }
 
 function mark(sIdx, month, wIdx) {
     let curr = students[sIdx].attendance[month][wIdx];
     students[sIdx].attendance[month][wIdx] = curr === "P" ? "A" : curr === "A" ? "-" : "P";
     saveData(); renderStudents();
+}
+
+function copyToClipboard(encodedMsg) {
+    navigator.clipboard.writeText(decodeURIComponent(encodedMsg)).then(() => alert("Copied!"));
 }
 
 function editStudent(idx) {
@@ -140,15 +150,21 @@ function editStudent(idx) {
     document.getElementById("group").value = s.group;
     document.getElementById("monthlyFee").value = s.fee;
     document.getElementById("editIdx").value = idx;
-    document.getElementById("formTitle").innerText = "📝 Edit Student";
     window.scrollTo(0,0);
 }
 
-function sendProgress(idx, month) {
-    let s = students[idx];
-    let att = s.attendance[month].filter(a=>a==='P').length;
-    let msg = `*Progress Report - ${month}*\nStudent: ${s.name}\nAttendance: ${att}/4\nFees: ${s.fees[month] || 'Pending'}`;
-    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
-}
+function addOrUpdateStudent() {
+    let name = document.getElementById("studentName").value;
+    let phone = document.getElementById("parentPhone").value;
+    let group = document.getElementById("group").value;
+    let fee = document.getElementById("monthlyFee").value;
+    let editIdx = document.getElementById("editIdx").value;
 
-function del(idx) { if(confirm("Delete this student?")) { students.splice(idx,1); saveData(); renderStudents(); } }
+    if(editIdx === "") {
+        students.push({ name, phone, group, fee, marks: {}, attendance: {}, fees: {} });
+    } else {
+        students[editIdx] = { ...students[editIdx], name, phone, group, fee };
+        document.getElementById("editIdx").value = "";
+    }
+    saveData(); renderStudents();
+}
