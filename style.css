@@ -1,51 +1,9 @@
-:root {
-    --primary: #2c3e50;
-    --accent: #3498db;
-    --success: #27ae60;
-    --danger: #e74c3c;
-    --warning: #f39c12;
-    --whatsapp: #25D366;
-}
-
-body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
-.container { max-width: 1200px; margin: auto; }
-
-/* Login UI */
-#loginBox { display: flex; justify-content: center; align-items: center; height: 80vh; }
-.login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 350px; }
-.login-card input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-.login-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-
-/* Header */
-.header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 15px 25px; border-radius: 15px; margin-bottom: 25px; }
-.logout-btn { background: var(--danger); border: none; color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
-
-/* Dashboard Sections */
-.form-section, .controls-section { background: white; padding: 20px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-.input-grid input, .input-grid select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-.add-btn { background: var(--success); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 16px; }
-
-/* Filters */
-#searchBar { width: 100%; padding: 15px; border: 2px solid var(--accent); border-radius: 10px; margin-bottom: 20px; box-sizing: border-box; font-size: 16px; }
-.filter-group { display: flex; gap: 12px; flex-wrap: wrap; }
-.filter-group select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; flex: 1; min-width: 130px; cursor: pointer; }
-
-/* Student Cards */
-.student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-.student-card { background: white; border-radius: 18px; padding: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); position: relative; border-top: 5px solid var(--accent); transition: 0.3s; }
-.student-card:hover { transform: translateY(-5px); }
-
-.type-tag { position: absolute; top: 15px; right: 15px; font-size: 10px; font-weight: bold; padding: 4px 8px; border-radius: 5px; text-transform: uppercase; }
-.Group-tag { background: #e3f2fd; color: #1976d2; }
-.Individual-tag { background: #fff3e0; color: #f57c00; }
-
-.attendance-box { display: flex; justify-content: space-around; background: #f8f9fa; padding: 12px; border-radius: 12px; margin: 15px 0; }
-.att-btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; background: #eee; font-weight: bold; }
-.present { background: var(--success) !important; color: white; }
-.absent { background: var(--danger) !important; color: white; }
-
-.card-actions button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.pay-btn { background: var(--warning); color: white; }
-.wa-btn { background: var(--whatsapp); color: white; }
-.del-btn { background: none; color: #999; font-size: 12px; margin-top: 15px; text-decoration: underline; }
+body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
+.card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
+.student-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 6px solid #007bff; position: relative; }
+.att-btn { padding: 8px 12px; margin: 4px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; }
+.present { background: #28a745; color: white; }
+.absent { background: #dc3545; color: white; }
+.wa-btn { background: #25D366; color: white; margin-top: 10px; }
