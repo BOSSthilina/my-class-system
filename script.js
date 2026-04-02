@@ -93,8 +93,34 @@ function send3WeekRemind(idx, month) {
 // රෑන්ක් එකත් එක්ක ප්‍රගති වාර්තාව යැවීම
 function sendProgress(idx, month, rank) {
     let s = students[idx];
-    let att = s.attendance[month].filter(a=>a==='P').length;
-    let msg = `*Progress Report - ${month}*\n\nStudent: ${s.name}\nClass Rank: No. ${rank}\nMarks: ${s.marks[month] || 0}\nAttendance: ${att}/4\nFees: ${(s.fees && s.fees[month] === "Paid") ? "Paid ✅" : "Pending"}\n\nKeep it up!`;
+    let att = s.attendance[month].filter(a => a === 'P').length;
+    let score = s.marks[month] || 0;
+    let paidStatus = (s.fees && s.fees[month] === "Paid") ? "Paid ✅" : "Pending ❌";
+
+    // ලකුණු අනුව මුළු පන්තියම පිළිවෙලට සකස් කිරීම (Top 3 හොයාගන්න)
+    let rankedAll = [...students]
+        .filter(st => st.group === s.group) // ඒ පන්තියේ ළමයි විතරක් ගන්නවා
+        .sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
+
+    let first = rankedAll[0] ? `${rankedAll[0].marks[month] || 0}` : "0";
+    let second = rankedAll[1] ? `${rankedAll[1].marks[month] || 0}` : "0";
+    let third = rankedAll[2] ? `${rankedAll[2].marks[month] || 0}` : "0";
+
+    // WhatsApp මැසේජ් එකේ අලුත් පෙනුම
+    let msg = `Student: *${s.name}*\n` +
+              `Grade: *${s.grade || 'N/A'}*\n` +
+              `--------------------------\n` +
+              `🏆 Your Child's Score: *${score}*\n` +
+              `📊 Class Rank: *${rank}*\n\n` +
+              `📈 Class Performance (${s.group}):\n` +
+              `- 🥇 1st Place: ${first}\n` +
+              `- 🥈 2nd Place: ${second}\n` +
+              `- 🥉 3rd Place: ${third}\n` +
+              `--------------------------\n` +
+              `Attendance: ${att}/4\n` +
+              `Status: ${paidStatus}\n\n` +
+              `Thank you!`;
+
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
 
