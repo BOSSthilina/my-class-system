@@ -1,29 +1,51 @@
-:root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --danger: #e74c3c; }
-body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 10px; }
-.login-container { max-width: 300px; margin: 100px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
-input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-button { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-.stat-card { background: white; padding: 10px; border-radius: 8px; text-align: center; font-size: 12px; font-weight: bold; border-bottom: 3px solid var(--accent); }
-
-.student-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-.attendance-box { display: flex; justify-content: space-between; margin: 15px 0; background: #f9f9f9; padding: 10px; border-radius: 5px; }
-.att-day { text-align: center; font-size: 11px; }
-.att-btn { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #ddd; background: white; cursor: pointer; margin-top: 5px; font-weight: bold; }
-.att-btn.present { background: var(--accent); color: white; border: none; }
-.att-btn.absent { background: var(--danger); color: white; border: none; }
-
-.card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-.pay-btn { background: #f39c12; font-size: 12px; }
-.wa-btn { background: #25D366; font-size: 11px; }
-.del-btn { background: #95a5a6; font-size: 11px; }
-.rank-badge { position: absolute; top: 10px; right: 10px; background: gold; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-.edit-btn-small {
-    background: #7f8c8d !important;
-    font-size: 11px !important;
-    padding: 5px !important;
+:root {
+    --primary: #2c3e50;
+    --accent: #3498db;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --warning: #f39c12;
+    --whatsapp: #25D366;
 }
-#edit-student-box input, #edit-student-box select {
-    margin-bottom: 5px;
-}
+
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
+.container { max-width: 1200px; margin: auto; }
+
+/* Login UI */
+#loginBox { display: flex; justify-content: center; align-items: center; height: 80vh; }
+.login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 350px; }
+.login-card input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+.login-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+
+/* Header */
+.header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 15px 25px; border-radius: 15px; margin-bottom: 25px; }
+.logout-btn { background: var(--danger); border: none; color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
+
+/* Dashboard Sections */
+.form-section, .controls-section { background: white; padding: 20px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+.input-grid input, .input-grid select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+.add-btn { background: var(--success); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 16px; }
+
+/* Filters */
+#searchBar { width: 100%; padding: 15px; border: 2px solid var(--accent); border-radius: 10px; margin-bottom: 20px; box-sizing: border-box; font-size: 16px; }
+.filter-group { display: flex; gap: 12px; flex-wrap: wrap; }
+.filter-group select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; flex: 1; min-width: 130px; cursor: pointer; }
+
+/* Student Cards */
+.student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+.student-card { background: white; border-radius: 18px; padding: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); position: relative; border-top: 5px solid var(--accent); transition: 0.3s; }
+.student-card:hover { transform: translateY(-5px); }
+
+.type-tag { position: absolute; top: 15px; right: 15px; font-size: 10px; font-weight: bold; padding: 4px 8px; border-radius: 5px; text-transform: uppercase; }
+.Group-tag { background: #e3f2fd; color: #1976d2; }
+.Individual-tag { background: #fff3e0; color: #f57c00; }
+
+.attendance-box { display: flex; justify-content: space-around; background: #f8f9fa; padding: 12px; border-radius: 12px; margin: 15px 0; }
+.att-btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; background: #eee; font-weight: bold; }
+.present { background: var(--success) !important; color: white; }
+.absent { background: var(--danger) !important; color: white; }
+
+.card-actions button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.pay-btn { background: var(--warning); color: white; }
+.wa-btn { background: var(--whatsapp); color: white; }
+.del-btn { background: none; color: #999; font-size: 12px; margin-top: 15px; text-decoration: underline; }
