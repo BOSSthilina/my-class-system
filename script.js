@@ -45,7 +45,7 @@ function renderStudents() {
         card.style.borderLeft = isPaid ? "8px solid #27ae60" : "8px solid #e74c3c";
         
         card.innerHTML = `
-            <h3>#${rank} - ${s.name} <span style="font-size:12px;">Rank: ${rank}</span></h3>
+            <h3>#${rank} - ${s.name} <span style="font-size:12px; color:#3498db;">(${s.grade || 'N/A'})</span></h3>  <-- මෙන්න මේ පේළිය තමයි අයින් කරන්න ඕනේ!
             <small>${s.group} | Fee: Rs.${s.fee}</small>
             
             <div style="margin:10px 0;">
