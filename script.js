@@ -86,7 +86,7 @@ function saveMarks(sIdx, month) {
 // 3 Week Reminder මැසේජ් එක
 function send3WeekRemind(idx, month) {
     let s = students[idx];
-    let msg = `ඔබගේ දරුවා (${s.name}) සති 3ක් පන්තියට පැමිණ නැත/ගාස්තු ගෙවා නැත. කරුණාකර ඒ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
+    let msg = `ඔබගේ දරුවා (${s.name}) සති 3ක් පන්තියට *පැමිණ ඇත* ගාස්තු ගෙවා නැත. කරුණාකර ඒ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
 
