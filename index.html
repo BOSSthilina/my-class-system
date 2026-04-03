@@ -74,9 +74,27 @@
                     <option value="Grade 11">Grade 11</option>
                 </select>
             </div>
-        </div>
-       
+        </div> 
 
+            <div class="card" id="incomeSummary" style="background: #f8f9fa; border-left: 8px solid #2980b9; margin-bottom: 20px;">
+                <h3 style="color: #2980b9; margin-top: 0;">💰 Income Summary (<span id="summaryMonth">-</span>)</h3>
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                    <div class="stat-box">
+                        <small style="color: #7f8c8d;">Total Expected</small><br>
+                        <b id="totalExpected" style="font-size: 1.2em; color: #2c3e50;">Rs. 0</b>
+                    </div>
+                    <div class="stat-box">
+                        <small style="color: #7f8c8d;">Collected</small><br>
+                        <b id="totalCollected" style="font-size: 1.2em; color: #27ae60;">Rs. 0</b>
+                    </div>
+                    <div class="stat-box">
+                        <small style="color: #7f8c8d;">Pending</small><br>
+                        <b id="totalPending" style="font-size: 1.2em; color: #e74c3c;">Rs. 0</b>
+                    </div>
+                </div>
+            </div>
+
+    
         <div class="card" id="pendingSection" style="border: 2px solid #e74c3c;">
             <h3 style="color: #e74c3c;">⚠️ Pending Payments (ගාස්තු ගෙවීමට ඇති අය)</h3>
             <div id="pendingDisplay"></div>
