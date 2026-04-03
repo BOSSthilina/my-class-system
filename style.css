@@ -122,3 +122,12 @@ select {
     font-size: 14px;
     height: 40px; /* උස අනිවාර්යයෙන්ම දෙන්න */
 }
+.stat-box {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+}
