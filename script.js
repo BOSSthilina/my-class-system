@@ -28,8 +28,8 @@ function renderStudents() {
 
     let filteredList = students.filter(s => {
     let matchesSearch = s.name.toLowerCase().includes(search);
-    let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade) || (!s.grade && selectedGrade === "All");
-    return matchesSearch && matchesGrade;
+    let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade) || (!s.grade);
+        return matchesSearch && matchesGrade;
     });
     // රෑන්ක් එක හැදීම (ලකුණු අනුව වැඩිම කෙනාගේ සිට අඩුම කෙනාට)
     let rankedStudents = [...students].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
