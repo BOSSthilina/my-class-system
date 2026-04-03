@@ -213,4 +213,5 @@ function addOrUpdateStudent() {
     document.getElementById("studentName").value = "";
     document.getElementById("parentPhone").value = "";
     document.getElementById("monthlyFee").value = "";
+    document.getElementById("studentGrade").value = "Grade 6";
 }
