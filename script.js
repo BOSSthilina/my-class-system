@@ -28,7 +28,7 @@ function renderStudents() {
 
     let filteredList = students.filter(s => {
     let matchesSearch = s.name.toLowerCase().includes(search);
-    let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
+    let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade) || (!s.grade && selectedGrade === "All");
     return matchesSearch && matchesGrade;
     });
     // රෑන්ක් එක හැදීම (ලකුණු අනුව වැඩිම කෙනාගේ සිට අඩුම කෙනාට)
