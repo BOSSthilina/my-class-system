@@ -23,12 +23,18 @@ function renderStudents() {
     let list = document.getElementById("studentList");
     let search = document.getElementById("searchBar").value.toLowerCase();
     let month = document.getElementById("monthSelect").value;
+    let selectedGrade = document.getElementById("gradeFilter").value;
     list.innerHTML = "";
 
+    let filteredList = students.filter(s => {
+    let matchesSearch = s.name.toLowerCase().includes(search);
+    let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
+    return matchesSearch && matchesGrade;
+    });
     // රෑන්ක් එක හැදීම (ලකුණු අනුව වැඩිම කෙනාගේ සිට අඩුම කෙනාට)
     let rankedStudents = [...students].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
 
-    students.filter(s => s.name.toLowerCase().includes(search)).forEach((s, idx) => {
+    filteredList.forEach((s, idx) => s.name.toLowerCase().includes(search)).forEach((s, idx) => {
         let sIdx = students.indexOf(s);
         let rank = rankedStudents.findIndex(rs => rs.name === s.name) + 1;
         
@@ -45,7 +51,7 @@ function renderStudents() {
         card.style.borderLeft = isPaid ? "8px solid #27ae60" : "8px solid #e74c3c";
         
         card.innerHTML = `
-            <h3>#${rank} - ${s.name} <span style="font-size:12px; color:#3498db;">(${s.grade || 'N/A'})</span></h3>  
+            <h3>#${rank} - ${s.name} <span style="font-size:12px; color:#3498db;">(${s.grade || 'N/A'})</span></h3>
             <small>${s.group} | Fee: Rs.${s.fee}</small>
             
             <div style="margin:10px 0;">
