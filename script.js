@@ -26,15 +26,18 @@ function renderStudents() {
     let selectedGrade = document.getElementById("gradeFilter").value;
     list.innerHTML = "";
 
+    // 1. මුලින්ම Filter කරගන්නවා
     let filteredList = students.filter(s => {
-    let matchesSearch = s.name.toLowerCase().includes(search);
-    let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade) || (!s.grade);
+        let matchesSearch = (s.name || "").toLowerCase().includes(search);
+        let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade) || (!s.grade && selectedGrade === "All");
         return matchesSearch && matchesGrade;
     });
-    // රෑන්ක් එක හැදීම (ලකුණු අනුව වැඩිම කෙනාගේ සිට අඩුම කෙනාට)
+
+    // 2. රෑන්ක් එක හැදීම
     let rankedStudents = [...students].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
 
-    filteredList.forEach((s, idx) => s.name.toLowerCase().includes(search)).forEach((s, idx) => {
+    // 3. දැන් ලිස්ට් එක පෙන්වනවා
+    filteredList.forEach((s) => {
         let sIdx = students.indexOf(s);
         let rank = rankedStudents.findIndex(rs => rs.name === s.name) + 1;
         
@@ -67,9 +70,7 @@ function renderStudents() {
                 <button onclick="togglePaid(${sIdx}, '${month}')" style="background:${isPaid?'#95a5a6':'#2ecc71'}; font-size:12px; padding:8px;">
                     ${isPaid ? 'Paid ✅' : 'Mark as Paid'}
                 </button>
-                
                 <button onclick="send3WeekRemind(${sIdx}, '${month}')" style="background:#f39c12; font-size:12px; padding:8px;">⚠️ 3-Week Remind</button>
-                
                 <button onclick="sendProgress(${sIdx}, '${month}', ${rank})" style="background:#3498db; font-size:12px; padding:8px;">📊 Send Rank</button>
             </div>
 
