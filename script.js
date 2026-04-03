@@ -80,6 +80,7 @@ function renderStudents() {
     });
 
     updatePendingList();
+    updateIncomeSummary();
 }
 
 // ලකුණු සේව් කිරීම
@@ -215,4 +216,26 @@ function addOrUpdateStudent() {
     document.getElementById("parentPhone").value = "";
     document.getElementById("monthlyFee").value = "";
     document.getElementById("studentGrade").value = "Grade 6";
+}
+function updateIncomeSummary() {
+    let month = document.getElementById("monthSelect").value;
+    let summaryMonthLabel = document.getElementById("summaryMonth");
+    if(summaryMonthLabel) summaryMonthLabel.innerText = month;
+
+    let totalExpected = 0;
+    let totalCollected = 0;
+
+    students.forEach(s => {
+        let fee = parseFloat(s.fee) || 0;
+        totalExpected += fee;
+        if (s.fees && s.fees[month] === "Paid") {
+            totalCollected += fee;
+        }
+    });
+
+    let totalPending = totalExpected - totalCollected;
+
+    document.getElementById("totalExpected").innerText = `Rs. ${totalExpected.toLocaleString()}`;
+    document.getElementById("totalCollected").innerText = `Rs. ${totalCollected.toLocaleString()}`;
+    document.getElementById("totalPending").innerText = `Rs. ${totalPending.toLocaleString()}`;
 }
