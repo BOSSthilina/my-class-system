@@ -45,11 +45,11 @@
             <input type="number" id="monthlyFee" placeholder="Monthly Fee (Rs.)">
             <button id="saveBtn" onclick="addOrUpdateStudent()">Save Student</button>
         </div>
-
-        <div class="card">
+<div class="card">
             <input type="text" id="searchBar" placeholder="🔍 Search Name..." onkeyup="renderStudents()">
+            
             <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <select id="monthSelect" onchange="renderStudents()">
+                <select id="monthSelect" onchange="renderStudents()" style="flex: 1; padding: 10px;">
                     <option value="January">January</option>
                     <option value="February">February</option>
                     <option value="March" selected>March</option>
@@ -63,11 +63,9 @@
                     <option value="November">November</option>
                     <option value="December">December</option>
                 </select>
-               <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <select id="monthSelect" onchange="renderStudents()" style="flex: 1; padding: 10px;">
-                    </select>
+
                 <select id="gradeFilter" onchange="renderStudents()" style="flex: 1; padding: 10px;">
-                    <option value="All">All Grades</option>
+                    <option value="All">All Grades (ඔක්කොම)</option>
                     <option value="Grade 6">Grade 6</option>
                     <option value="Grade 7">Grade 7</option>
                     <option value="Grade 8">Grade 8</option>
@@ -76,8 +74,8 @@
                     <option value="Grade 11">Grade 11</option>
                 </select>
             </div>
-            </div>
         </div>
+       
 
         <div class="card" id="pendingSection" style="border: 2px solid #e74c3c;">
             <h3 style="color: #e74c3c;">⚠️ Pending Payments (ගාස්තු ගෙවීමට ඇති අය)</h3>
