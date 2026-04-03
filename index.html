@@ -63,8 +63,11 @@
                     <option value="November">November</option>
                     <option value="December">December</option>
                 </select>
-                <select id="gradeFilter" onchange="renderStudents()">
-                    <option value="All">All Grades (ඔක්කොම)</option>
+               <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <select id="monthSelect" onchange="renderStudents()" style="flex: 1; padding: 10px;">
+                    </select>
+                <select id="gradeFilter" onchange="renderStudents()" style="flex: 1; padding: 10px;">
+                    <option value="All">All Grades</option>
                     <option value="Grade 6">Grade 6</option>
                     <option value="Grade 7">Grade 7</option>
                     <option value="Grade 8">Grade 8</option>
@@ -72,6 +75,7 @@
                     <option value="Grade 10">Grade 10</option>
                     <option value="Grade 11">Grade 11</option>
                 </select>
+            </div>
             </div>
         </div>
 
