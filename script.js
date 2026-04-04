@@ -224,18 +224,38 @@ function updateIncomeSummary() {
 
     let totalExpected = 0;
     let totalCollected = 0;
+    
+    // Grade Counts තියාගන්න Object එකක්
+    let counts = {}; 
 
     students.forEach(s => {
+        // 1. මුදල් ගණනය කිරීම
         let fee = parseFloat(s.fee) || 0;
         totalExpected += fee;
         if (s.fees && s.fees[month] === "Paid") {
             totalCollected += fee;
         }
+
+        // 2. Grade එක අනුව ළමයි ගණන් කිරීම
+        let g = s.grade || "N/A";
+        counts[g] = (counts[g] || 0) + 1;
     });
 
     let totalPending = totalExpected - totalCollected;
 
+    // --- HTML එකට දත්ත යැවීම ---
     document.getElementById("totalExpected").innerText = `Rs. ${totalExpected.toLocaleString()}`;
     document.getElementById("totalCollected").innerText = `Rs. ${totalCollected.toLocaleString()}`;
     document.getElementById("totalPending").innerText = `Rs. ${totalPending.toLocaleString()}`;
+    
+    // මුළු ළමයි ගණන පෙන්වීම
+    document.getElementById("totalStudentsCount").innerText = students.length;
+
+    // Grade අනුව විස්තරය ලස්සනට පෙන්වීම
+    let gradeHtml = Object.keys(counts)
+        .sort() // Grade ටික පිළිවෙලට සකස් කිරීම
+        .map(g => `<span>${g}: ${counts[g]}</span>`)
+        .join("");
+    
+    document.getElementById("gradeCounts").innerHTML = gradeHtml;
 }
