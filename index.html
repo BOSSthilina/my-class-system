@@ -79,23 +79,31 @@
             </div>
         </div> 
 
-            <div class="card" id="incomeSummary" style="background: #f8f9fa; border-left: 8px solid #2980b9; margin-bottom: 20px;">
-                <h3 style="color: #2980b9; margin-top: 0;">💰 Income Summary (<span id="summaryMonth">-</span>)</h3>
-                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-                    <div class="stat-box">
-                        <small style="color: #7f8c8d;">Total Expected</small><br>
-                        <b id="totalExpected" style="font-size: 1.2em; color: #2c3e50;">Rs. 0</b>
+                    <div class="card" id="incomeSummary" style="background: #f8f9fa; border-left: 8px solid #2980b9; margin-bottom: 20px;">
+                        <h3 style="color: #2980b9; margin-top: 0;">📊 Class Summary (<span id="summaryMonth">-</span>)</h3>
+                        
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <div class="stat-box">
+                                <small>Total Expected</small><br>
+                                <b id="totalExpected" style="color: #2c3e50;">Rs. 0</b>
+                            </div>
+                            <div class="stat-box">
+                                <small>Collected</small><br>
+                                <b id="totalCollected" style="color: #27ae60;">Rs. 0</b>
+                            </div>
+                            <div class="stat-box">
+                                <small>Pending</small><br>
+                                <b id="totalPending" style="color: #e74c3c;">Rs. 0</b>
+                            </div>
+                            <div class="stat-box" style="border-top: 3px solid #9b59b6;">
+                                <small>Total Students</small><br>
+                                <b id="totalStudentsCount" style="color: #8e44ad; font-size: 1.2em;">0</b>
+                            </div>
+                        </div>
+                    
+                        <div id="gradeCounts" style="margin-top: 15px; font-size: 13px; color: #555; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; border-top: 1px solid #ddd; padding-top: 10px;">
+                            </div>
                     </div>
-                    <div class="stat-box">
-                        <small style="color: #7f8c8d;">Collected</small><br>
-                        <b id="totalCollected" style="font-size: 1.2em; color: #27ae60;">Rs. 0</b>
-                    </div>
-                    <div class="stat-box">
-                        <small style="color: #7f8c8d;">Pending</small><br>
-                        <b id="totalPending" style="font-size: 1.2em; color: #e74c3c;">Rs. 0</b>
-                    </div>
-                </div>
-            </div>
 
     
         <div class="card" id="pendingSection" style="border: 2px solid #e74c3c;">
