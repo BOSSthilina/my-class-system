@@ -124,10 +124,17 @@ select {
 }
 .stat-box {
     background: white;
-    padding: 10px 15px;
+    padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     flex: 1;
-    min-width: 120px;
+    min-width: 100px;
     text-align: center;
+}
+
+#gradeCounts span {
+    background: #eee;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
 }
