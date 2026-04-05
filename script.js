@@ -24,16 +24,19 @@ function renderStudents() {
     let search = document.getElementById("searchBar").value.toLowerCase();
     let month = document.getElementById("monthSelect").value;
     let selectedGrade = document.getElementById("gradeFilter").value;
+    let selectedGroup = document.getElementById("groupFilter").value; // 👈 අලුත් Group Filter එක ගන්නවා
     list.innerHTML = "";
 
-    // 1. මුලින්ම Filter කරගන්නවා
+    // 1. Filter කිරීම (Grade එකයි Group එකයි දෙකම බලනවා)
     let filteredList = students.filter(s => {
         let matchesSearch = (s.name || "").toLowerCase().includes(search);
-        let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade) || (!s.grade && selectedGrade === "All");
-        return matchesSearch && matchesGrade;
+        let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
+        let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup); // 👈 Group එකත් හරිනම් විතරයි ගන්නේ
+        
+        return matchesSearch && matchesGrade && matchesGroup;
     });
 
-    // 2. රෑන්ක් එක හැදීම
+    // 2. රෑන්ක් එක හැදීම (මේක මුළු ශිෂ්‍ය ලැයිස්තුවෙන්ම හෝ filter කරපු අයගෙන් තීරණය කළ හැකියි)
     let rankedStudents = [...students].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
 
     // 3. දැන් ලිස්ට් එක පෙන්වනවා
@@ -53,7 +56,6 @@ function renderStudents() {
         card.className = "student-card";
         card.style.borderLeft = isPaid ? "8px solid #27ae60" : "8px solid #e74c3c";
         
-        // 🥇 🥈 🥉 Top 3 Badge එක තීරණය කිරීම
         let badge = "";
         if (score > 0) {
             if (rank === 1) badge = "🥇 1st Place";
@@ -94,7 +96,8 @@ function renderStudents() {
     });
 
     updatePendingList();
-    updateIncomeSummary();
+    // 👈 පන්තිය අනුව Summary එක හැදෙන්න filteredList එක යවනවා
+    updateIncomeSummary(filteredList); 
 }
 
 // ලකුණු සේව් කිරීම
