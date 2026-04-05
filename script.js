@@ -96,7 +96,6 @@ function renderStudents() {
     });
 
     updatePendingList();
-    // 👈 පන්තිය අනුව Summary එක හැදෙන්න filteredList එක යවනවා
     updateIncomeSummary(filteredList); 
 }
 
@@ -239,18 +238,19 @@ function addOrUpdateStudent() {
     document.getElementById("monthlyFee").value = "";
     document.getElementById("studentGrade").value = "Grade 6";
 }
-function updateIncomeSummary() {
+function updateIncomeSummary(dataToShow) {
+    // dataToShow තිබුණොත් ඒක ගන්නවා, නැත්නම් ඔක්කොම ශිෂ්‍යයෝ (students) ගන්නවා
+    let listToCalculate = dataToShow || students; 
+    
     let month = document.getElementById("monthSelect").value;
     let summaryMonthLabel = document.getElementById("summaryMonth");
     if(summaryMonthLabel) summaryMonthLabel.innerText = month;
 
     let totalExpected = 0;
     let totalCollected = 0;
-    
-    // Grade Counts තියාගන්න Object එකක්
     let counts = {}; 
 
-    students.forEach(s => {
+    listToCalculate.forEach(s => {
         // 1. මුදල් ගණනය කිරීම
         let fee = parseFloat(s.fee) || 0;
         totalExpected += fee;
@@ -265,17 +265,17 @@ function updateIncomeSummary() {
 
     let totalPending = totalExpected - totalCollected;
 
-    // --- HTML එකට දත්ත යැවීම ---
+    // HTML එකට දත්ත යැවීම
     document.getElementById("totalExpected").innerText = `Rs. ${totalExpected.toLocaleString()}`;
     document.getElementById("totalCollected").innerText = `Rs. ${totalCollected.toLocaleString()}`;
     document.getElementById("totalPending").innerText = `Rs. ${totalPending.toLocaleString()}`;
     
-    // මුළු ළමයි ගණන පෙන්වීම
-    document.getElementById("totalStudentsCount").innerText = students.length;
+    // දැනට පෙන්වන (Filter වෙලා තියෙන) ළමයි ගණන
+    document.getElementById("totalStudentsCount").innerText = listToCalculate.length;
 
-    // Grade අනුව විස්තරය ලස්සනට පෙන්වීම
+    // Grade අනුව විස්තරය
     let gradeHtml = Object.keys(counts)
-        .sort() // Grade ටික පිළිවෙලට සකස් කිරීම
+        .sort()
         .map(g => `<span>${g}: ${counts[g]}</span>`)
         .join("");
     
