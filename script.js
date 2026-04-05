@@ -53,8 +53,19 @@ function renderStudents() {
         card.className = "student-card";
         card.style.borderLeft = isPaid ? "8px solid #27ae60" : "8px solid #e74c3c";
         
+        // 🥇 🥈 🥉 Top 3 Badge එක තීරණය කිරීම
+        let badge = "";
+        if (score > 0) {
+            if (rank === 1) badge = "🥇 1st Place";
+            else if (rank === 2) badge = "🥈 2nd Place";
+            else if (rank === 3) badge = "🥉 3rd Place";
+        }
+
         card.innerHTML = `
-            <h3>#${rank} - ${s.name} <span style="font-size:12px; color:#3498db;">(${s.grade || 'N/A'})</span></h3>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>#${rank} - ${s.name} <span style="font-size:12px; color:#3498db;">(${s.grade || 'N/A'})</span></h3>
+                ${badge ? `<span style="background:#f1c40f; color:black; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:bold;">${badge}</span>` : ""}
+            </div>
             <small>${s.group} | Fee: Rs.${s.fee}</small>
             
             <div style="margin:10px 0;">
@@ -70,11 +81,14 @@ function renderStudents() {
                 <button onclick="togglePaid(${sIdx}, '${month}')" style="background:${isPaid?'#95a5a6':'#2ecc71'}; font-size:12px; padding:8px;">
                     ${isPaid ? 'Paid ✅' : 'Mark as Paid'}
                 </button>
-                <button onclick="send3WeekRemind(${sIdx}, '${month}')" style="background:#f39c12; font-size:12px; padding:8px;">⚠️ 3-Week Remind</button>
-                <button onclick="sendProgress(${sIdx}, '${month}', ${rank})" style="background:#3498db; font-size:12px; padding:8px;">📊 Send Rank</button>
+                <button onclick="send3WeekRemind(${sIdx}, '${month}')" style="background:#f39c12; font-size:12px; padding:8px;">⚠️ Remind</button>
+                <button onclick="sendProgress(${sIdx}, '${month}', ${rank})" style="background:#3498db; font-size:12px; padding:8px;">📊 Rank</button>
             </div>
 
-            <button onclick="editStudent(${sIdx})" style="background:none; color:gray; border:none; font-size:11px; cursor:pointer;">Edit Details</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed #ddd; padding-top: 8px;">
+                <button onclick="editStudent(${sIdx})" style="background:none; color:gray; border:none; font-size:11px; cursor:pointer;">📝 Edit Details</button>
+                <button onclick="deleteStudent(${sIdx})" style="background:none; color:#e74c3c; border:none; font-size:11px; cursor:pointer; font-weight:bold;">🗑️ Remove Student</button>
+            </div>
         `;
         list.appendChild(card);
     });
