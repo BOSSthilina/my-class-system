@@ -259,3 +259,12 @@ function updateIncomeSummary() {
     
     document.getElementById("gradeCounts").innerHTML = gradeHtml;
 }
+
+function deleteStudent(idx) {
+    let s = students[idx];
+    if(confirm(`ඔබට "${s.name}" ශිෂ්‍යයාව පද්ධතියෙන් ඉවත් කිරීමට අවශ්‍ය බව සහතිකද?`)) {
+        students.splice(idx, 1);
+        saveData(); 
+        renderStudents(); 
+    }
+}
