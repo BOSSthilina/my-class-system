@@ -287,3 +287,25 @@ function deleteStudent(idx) {
         renderStudents(); 
     }
 }
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    const btn = document.querySelector(".dark-mode-toggle");
+    
+    if (document.body.classList.contains("dark-mode")) {
+        btn.innerText = "☀️"; // Dark mode එකේදී ඉර පෙන්වනවා
+        localStorage.setItem("theme", "dark");
+    } else {
+        btn.innerText = "🌙"; // Light mode එකේදී හඳ පෙන්වනවා
+        localStorage.setItem("theme", "light");
+    }
+}
+
+// පේජ් එක මුලින්ම ලෝඩ් වෙනකොට කලින් දාපු Settings බලනවා
+window.onload = function() {
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-mode");
+        document.querySelector(".dark-mode-toggle").innerText = "☀️";
+    }
+    // මෙතන ඔයාගේ පරණ loadData() එක තියෙනවා නම් ඒකත් ලෝඩ් වෙයි
+    if(typeof loadData === "function") loadData(); 
+}
