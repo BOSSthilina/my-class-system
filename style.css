@@ -224,3 +224,13 @@ body.dark-mode #pendingDisplay pre {
 body.dark-mode .stat-box small {
     color: #bdc3c7;
 }
+.stat-box {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    flex: 1;
+    min-width: 100px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-top: 3px solid #2980b9;
+}
