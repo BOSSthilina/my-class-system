@@ -202,18 +202,16 @@ function updatePendingList() {
 // අනිත් සාමාන්‍ය Functions (Edit, Delete, TogglePaid, Mark)
 async function togglePaid(idx, month) {
     let s = students[idx];
-    
-    // 1. Payment එක Toggle කරනවා
-    // ඔයාගේ renderStudents එකේ බලන්නේ s.fees[month] නිසා අපි ඒකම පාවිච්චි කරමු
     if (!s.fees) s.fees = {};
     
+    // 1. Status එක මාරු කරනවා
     if (s.fees[month] === "Paid") {
         s.fees[month] = "Unpaid";
     } else {
         s.fees[month] = "Paid";
         
-        // 2. "Paid" කරපු වෙලාවට විතරක් රිසිට් එක WhatsApp යවනවා
-        let date = new Date().toLocaleDateString('en-GB'); // DD/MM/YYYY
+        // 2. ගෙවපු වෙලාවට විතරක් ලස්සන WhatsApp Receipt එකක් හදනවා
+        let date = new Date().toLocaleDateString('en-GB'); 
         let receiptNo = "RCPT-" + Date.now().toString().slice(-6); 
         
         let msg = `━━━━━━━━━━━━━━━━━━━━
@@ -223,7 +221,7 @@ async function togglePaid(idx, month) {
 *RECEIPT NO:* #${receiptNo}
 ━━━━━━━━━━━━━━━━━━━━
 *NAME:* ${s.name}
-*GRADE:* ${s.grade}
+*GRADE:* ${s.grade || 'N/A'}
 *MONTH:* ${month}
 *FEE:* Rs. ${s.fee}.00
 ━━━━━━━━━━━━━━━━━━━━
@@ -231,13 +229,11 @@ async function togglePaid(idx, month) {
 ━━━━━━━━━━━━━━━━━━━━
 ස්තුතියි! පන්තියේදී හමුවෙමු.`;
 
-        let url = `https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`;
-        window.open(url, '_blank');
+        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // 3. Data Save කරලා Screen එක Update කරනවා
-    await saveData();
-    renderStudents();
+    await saveData(); // Data save කරනවා
+    renderStudents(); // Screen එක refresh කරනවා
 }
 
 function mark(sIdx, month, wIdx) {
