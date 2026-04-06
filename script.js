@@ -151,34 +151,53 @@ function sendProgress(idx, month) {
 
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
-// සල්ලි ගෙවපු නැති අයගේ ලිස්ට් එක (Pending List)
+// ⚠️ පරණ updatePendingList එක වෙනුවට මේක විතරක් දාන්න
 function updatePendingList() {
     let month = document.getElementById("monthSelect").value;
+    let selectedGroup = document.getElementById("groupFilter").value; // දැනට තෝරලා තියෙන පන්තිය
     let display = document.getElementById("pendingDisplay");
     display.innerHTML = "";
 
-    let groups = [...new Set(students.map(s => s.group))];
+    // 1. Filter එක "All" නම් ඔක්කොම පන්ති ගන්නවා, නැත්නම් තෝරපු පන්තිය විතරක් ගන්නවා
+    let groupsToShow = (selectedGroup === "All") 
+        ? [...new Set(students.map(s => s.group))] 
+        : [selectedGroup];
 
-    groups.forEach(groupName => {
+    groupsToShow.forEach(groupName => {
+        // අදාළ පන්තියේ සල්ලි ගෙවපු නැති අයව විතරක් පෙරා ගන්නවා
         let unpaid = students.filter(s => s.group === groupName && (!s.fees || s.fees[month] !== "Paid"));
 
         if (unpaid.length > 0) {
             let namesList = unpaid.map((s, i) => `${i+1}. ${s.name}`).join("\n");
-            let waMsg = `*${groupName} - ${month} පන්තියට ගාස්තු ගෙවීමට ඇති සිසුන්:*\n\n${namesList}\n\nකරුණාකර ගෙවීම් පියවන්න.`;
+            
+            // WhatsApp එකට යවන මැසේජ් එක
+            let waMsg = `*⚠️ PENDING PAYMENTS - ${groupName}*\n` +
+                        `*Month:* ${month}\n` +
+                        `--------------------------\n` +
+                        `${namesList}\n` +
+                        `--------------------------\n` +
+                        `කරුණාකර ගාස්තු ගෙවා ඇත්නම් දැනුම් දෙන්න. ස්තූතියි!`;
 
             let div = document.createElement("div");
             div.style.padding = "10px";
             div.style.borderBottom = "1px solid #ddd";
             div.innerHTML = `
-                <small><b>${groupName}</b></small>
-                <pre style="font-size:11px;">${namesList}</pre>
-                <button onclick="copyToClipboard('${encodeURIComponent(waMsg)}')" style="background:#25D366; font-size:11px; padding:5px;">Copy List</button>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <small><b>📌 ${groupName}</b></small>
+                    <span style="font-size:10px; color:#e74c3c; font-weight:bold;">${unpaid.length} Pending</span>
+                </div>
+                <pre style="font-size:11px; background:#f9f9f9; padding:8px; border-radius:4px; margin:8px 0; border:1px solid #eee;">${namesList}</pre>
+                <button onclick="copyToClipboard('${encodeURIComponent(waMsg)}')" style="background:#25D366; font-size:11px; padding:6px; width:100%; border-radius:5px;">📋 Copy ${groupName} List</button>
             `;
             display.appendChild(div);
         }
     });
-}
 
+    // කිසිම කෙනෙක් නැත්නම්
+    if (display.innerHTML === "") {
+        display.innerHTML = "<p style='font-size:12px; color:gray; text-align:center; padding:10px;'>මෙම පන්තියේ සියලුම දෙනා ගෙවීම් කර ඇත. ✅</p>";
+    }
+}
 // අනිත් සාමාන්‍ය Functions (Edit, Delete, TogglePaid, Mark)
 function togglePaid(sIdx, month) {
     if(!students[sIdx].fees) students[sIdx].fees = {};
