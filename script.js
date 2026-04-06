@@ -487,25 +487,56 @@ function exportToExcel() {
     document.body.appendChild(link);
     link.click();
 }
+// 1. කලින් තිබුණ checkBirthdays එක වෙනුවට මේක දාන්න
 function checkBirthdays() {
     let today = new Date();
-    // මාසය සහ දිනය (MM-DD) මේ විදිහට ගන්නවා: 04-07
+    // MM-DD format එක (උදා: 04-07)
     let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
     
-    // HTML එකේ birthdayAlert div එක තියෙනවද බලනවා
     let alertDiv = document.getElementById("birthdayAlert");
     if (!alertDiv) return;
 
-    // උපන්දිනය අද දිනට ගැලපෙන ළමයින්ව පෙරනවා
     let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
     
     if(birthdaysToday.length > 0) {
         let names = birthdaysToday.map(s => s.name).join(", ");
-        alertDiv.innerHTML = `🎉 Today's Birthdays: <b>${names}</b> 🎂`;
-        alertDiv.style.display = "block"; // Alert එක පෙන්වන්න
-        alertDiv.style.background = "#fff3e0"; // පොඩි ලස්සන පාටක්
-        alertDiv.style.padding = "10px";
+        alertDiv.innerHTML = `
+            <div style="background:#fff3e0; padding:15px; border-radius:10px; border:1px dashed #ff9800; display:flex; justify-content:space-between; align-items:center;">
+                <span>🎉 Today's Birthdays: <b>${names}</b> 🎂</span>
+                <button onclick="sendBulkBirthdays()" style="background:#25D366; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📲 Send WhatsApp Wishes</button>
+            </div>
+        `;
+        alertDiv.style.display = "block";
     } else {
-        alertDiv.style.display = "none"; // අද උපන්දින නැත්නම් පෙන්නන්න එපා
+        alertDiv.style.display = "none";
     }
+}
+
+// 2. මේක අලුතින්ම යටින් ඇඩ් කරන්න (Wishes යවන කොටස)
+async function sendBulkBirthdays() {
+    let today = new Date();
+    let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
+    let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
+
+    if (!confirm(`${birthdaysToday.length} දෙනෙකුට සුබපැතුම් යවන්නද?`)) return;
+
+    for (let i = 0; i < birthdaysToday.length; i++) {
+        let s = birthdaysToday[i];
+        
+        // මෙතන ඔයාට ඕන විදිහට මැසේජ් එක වෙනස් කරගන්න පුළුවන්
+        let msg = `🌟 *HAPPY BIRTHDAY!* 🌟\n\n` +
+                  `ආදරණීය *${s.name}*,\n` +
+                  `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! 🎂✨\n\n` +
+                  `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
+                  `මීට,\n*Thilina Sir*`;
+
+        // WhatsApp Window එක Open කරනවා
+        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+
+        // එක ළමයෙක්ට වඩා ඉන්නවා නම් තත්පර 5ක විවේකයක් දෙනවා
+        if (birthdaysToday.length > 1) {
+            await new Promise(r => setTimeout(r, 5000));
+        }
+    }
+    alert("සියලුම සුබපැතුම් යවා අවසන්!");
 }
