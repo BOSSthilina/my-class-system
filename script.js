@@ -199,10 +199,29 @@ function updatePendingList() {
     }
 }
 // අනිත් සාමාන්‍ය Functions (Edit, Delete, TogglePaid, Mark)
-function togglePaid(sIdx, month) {
+async function togglePaid(sIdx, month) {
     if(!students[sIdx].fees) students[sIdx].fees = {};
-    students[sIdx].fees[month] = (students[sIdx].fees[month] === "Paid") ? "Unpaid" : "Paid";
-    saveData(); renderStudents();
+    
+    let currentStatus = students[sIdx].fees[month];
+    let newStatus = (currentStatus === "Paid") ? "Unpaid" : "Paid";
+    students[sIdx].fees[month] = newStatus;
+
+    if (newStatus === "Paid") {
+        let s = students[sIdx];
+        let receiptMsg = `*--- 🧾 PAYMENT RECEIPT ---*\n\n` +
+                         `Student: *${s.name}*\n` +
+                         `Month: *${month}*\n` +
+                         `Amount Paid: *Rs. ${s.fee}* /=\n` +
+                         `Status: *SUCCESSFULLY PAID ✅*\n\n` +
+                         `Thank you for the payment!\n_System Generated Receipt_`;
+
+        if(confirm("ගෙවීම් තහවුරුයි! WhatsApp Receipt එක යවන්නද?")) {
+            window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(receiptMsg)}`, '_blank');
+        }
+    }
+
+    saveData();
+    renderStudents();
 }
 
 function mark(sIdx, month, wIdx) {
@@ -428,4 +447,17 @@ async function sendBulk3WeekReminders() {
     }
 
     statusDiv.innerText = "✅ සියලුම Reminders යවා අවසන්!";
+}
+function exportToExcel() {
+    let csvContent = "data:text/csv;charset=utf-8,Name,Phone,Grade,Group,Monthly Fee\n";
+    students.forEach(s => {
+        csvContent += `${s.name},${s.phone},${s.grade},${s.group},${s.fee}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Student_List_Backup.csv");
+    document.body.appendChild(link);
+    link.click();
 }
