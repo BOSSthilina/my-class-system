@@ -254,7 +254,7 @@ function addOrUpdateStudent() {
     document.getElementById("studentName").value = "";
     document.getElementById("parentPhone").value = "";
     document.getElementById("monthlyFee").value = "";
-    document.getElementById("studentGrade").value = "Grade 6";
+    document.getElementById("studentGrade").value = "";
 }
 function updateIncomeSummary(dataToShow) {
     // dataToShow තිබුණොත් ඒක ගන්නවා, නැත්නම් ඔක්කොම ශිෂ්‍යයෝ (students) ගන්නවා
