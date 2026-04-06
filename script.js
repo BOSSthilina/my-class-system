@@ -311,3 +311,58 @@ window.onload = function() {
     // මෙතන ඔයාගේ පරණ loadData() එක තියෙනවා නම් ඒකත් ලෝඩ් වෙයි
     if(typeof loadData === "function") loadData(); 
 }
+async function sendBulkProgress() {
+    let month = document.getElementById("monthSelect").value;
+    let search = document.getElementById("searchBar").value.toLowerCase();
+    let selectedGrade = document.getElementById("gradeFilter").value;
+    let selectedGroup = document.getElementById("groupFilter").value;
+
+    // දැනට පේන්න ඉන්න (Filter කරපු) ළමයි ටික විතරක් ගන්නවා
+    let listToSend = students.filter(s => {
+        let matchesSearch = (s.name || "").toLowerCase().includes(search);
+        let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
+        let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup);
+        return matchesSearch && matchesGrade && matchesGroup;
+    });
+
+    if (listToSend.length === 0) return alert("යවන්න ළමයි කවුරුත් නැහැ!");
+
+    if (!confirm(`${listToSend.length} දෙනෙකුට මැසේජ් යවන්නද?`)) return;
+
+    let statusDiv = document.getElementById("bulkStatus");
+
+    for (let i = 0; i < listToSend.length; i++) {
+        let s = listToSend[i];
+        let score = s.marks?.[month] || 0;
+
+        // රෑන්ක් එක සහ Top 3 ගණනය කිරීම (Grade එක අනුව)
+        let sameGradeStudents = students.filter(st => st.grade === s.grade);
+        let rankedInGrade = [...sameGradeStudents].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
+        let rank = rankedInGrade.findIndex(rs => rs.name === s.name) + 1;
+        let first = rankedInGrade[0]?.marks?.[month] || 0;
+        let second = rankedInGrade[1]?.marks?.[month] || 0;
+        let third = rankedInGrade[2]?.marks?.[month] || 0;
+
+        let msg = `Student: *${s.name}*\n` +
+                  `Grade: *${s.grade || 'N/A'}*\n` +
+                  `--------------------------\n` +
+                  `🏆 Your Child's Score: *${score}*\n` +
+                  `📊 Class Rank: *${rank}*\n\n` +
+                  `📈 Class Performance (${s.grade}):\n` +
+                  `- 🥇 1st Place: ${first}\n` +
+                  `- 🥈 2nd Place: ${second}\n` +
+                  `- 🥉 3rd Place: ${third}\n` +
+                  `--------------------------\n\n` +
+                  `Thank you!`;
+
+        statusDiv.innerText = `Sending to ${s.name} (${i + 1}/${listToSend.length})...`;
+
+        // WhatsApp Web window එක open කරනවා
+        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+
+        // පද්ධතිය ටිකක් වෙලා නතර කරනවා (Delay එකක් දානවා WhatsApp එකට ලේසි වෙන්න)
+        await new Promise(resolve => setTimeout(resolve, 10000)); 
+    }
+
+    statusDiv.innerText = "✅ සියලුම මැසේජ් යවා අවසන්!";
+}
