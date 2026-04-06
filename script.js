@@ -524,11 +524,11 @@ async function sendBulkBirthdays() {
         let s = birthdaysToday[i];
         
         // මෙතන ඔයාට ඕන විදිහට මැසේජ් එක වෙනස් කරගන්න පුළුවන්
-        let msg = `🌟 *HAPPY BIRTHDAY!* 🌟\n\n` +
-                  `ආදරණීය *${s.name}*,\n` +
-                  `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! 🎂✨\n\n` +
-                  `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
-                  `මීට,\n*Thilina Sir*`;
+        let msg = `\u{1F31F} *HAPPY BIRTHDAY!* \u{1F31F}\n\n` +
+          `ආදරණීය *${s.name}*,\n` +
+          `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! \u{1F382}\u{2728}\n\n` +
+          `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
+          `මීට,\n*Thilina Sir*`;
 
         // WhatsApp Window එක Open කරනවා
         window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
