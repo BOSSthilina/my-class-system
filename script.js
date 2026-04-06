@@ -5,6 +5,7 @@ async function loadData() {
     const res = await fetch(SCRIPT_URL);
     students = await res.json();
     renderStudents();
+    checkBirthdays();
 }
 
 async function saveData() {
@@ -246,6 +247,7 @@ function editStudent(idx) {
 
 function addOrUpdateStudent() {
     let name = document.getElementById("studentName").value;
+    let dob = document.getElementById("studentDOB").value;
     let phone = document.getElementById("parentPhone").value;
     let grade = document.getElementById("studentGrade").value; // Grade එක ගන්නවා
     let group = document.getElementById("group").value;
@@ -255,10 +257,11 @@ function addOrUpdateStudent() {
     if(name === "" || phone === "") { alert("සම්පූර්ණ විස්තර ඇතුළත් කරන්න"); return; }
 
     if(editIdx === "") {
-        students.push({ name, phone, grade, group, fee, marks: {}, attendance: {}, fees: {} });
+        students.push({ name, phone, grade, group, fee, dob, marks: {}, attendance: {}, fees: {} }); // 👈 dob එක මෙතනට දාන්න
     } else {
         // පරණ දත්ත වලට grade එක එකතු කරනවා
         students[editIdx].name = name;
+        students[editIdx].dob = dob;
         students[editIdx].phone = phone;
         students[editIdx].grade = grade;
         students[editIdx].group = group;
@@ -268,6 +271,7 @@ function addOrUpdateStudent() {
     }
     saveData(); 
     renderStudents();
+    checkBirthdays();
     
     // ලිස්ට් එක හිස් කරනවා
     document.getElementById("studentName").value = "";
@@ -342,13 +346,16 @@ function toggleDarkMode() {
 
 // පේජ් එක මුලින්ම ලෝඩ් වෙනකොට කලින් දාපු Settings බලනවා
 window.onload = function() {
+    // 1. කලින් සේව් කරපු තීම් එක (Dark/Light) බලලා ඇප්ලයි කරනවා
     if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark-mode");
         document.querySelector(".dark-mode-toggle").innerText = "☀️";
     }
-    // මෙතන ඔයාගේ පරණ loadData() එක තියෙනවා නම් ඒකත් ලෝඩ් වෙයි
-    if(typeof loadData === "function") loadData(); 
-}
+
+    // 2. දත්ත ලෝඩ් කරන එක මෙතනදී එක පාරක් කරනවා
+    // loadData() ඇතුළේ renderStudents() සහ checkBirthdays() තියෙන නිසා ඔක්කොම ලෝඩ් වෙනවා
+    loadData(); 
+};
 async function sendBulkProgress() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
@@ -449,9 +456,12 @@ async function sendBulk3WeekReminders() {
     statusDiv.innerText = "✅ සියලුම Reminders යවා අවසන්!";
 }
 function exportToExcel() {
+    // Column names ටික මුලින් දාගන්නවා
     let csvContent = "data:text/csv;charset=utf-8,Name,Phone,Grade,Group,Monthly Fee\n";
+    
     students.forEach(s => {
-        csvContent += `${s.name},${s.phone},${s.grade},${s.group},${s.fee}\n`;
+        // ඔයා ලියපු ලයින් එක මෙතනට එන්නේ:
+        csvContent += `"${s.name}","${s.phone}","${s.grade}","${s.group}","${s.fee}"\n`;
     });
 
     const encodedUri = encodeURI(csvContent);
@@ -460,4 +470,26 @@ function exportToExcel() {
     link.setAttribute("download", "Student_List_Backup.csv");
     document.body.appendChild(link);
     link.click();
+}
+function checkBirthdays() {
+    let today = new Date();
+    // මාසය සහ දිනය (MM-DD) මේ විදිහට ගන්නවා: 04-07
+    let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
+    
+    // HTML එකේ birthdayAlert div එක තියෙනවද බලනවා
+    let alertDiv = document.getElementById("birthdayAlert");
+    if (!alertDiv) return;
+
+    // උපන්දිනය අද දිනට ගැලපෙන ළමයින්ව පෙරනවා
+    let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
+    
+    if(birthdaysToday.length > 0) {
+        let names = birthdaysToday.map(s => s.name).join(", ");
+        alertDiv.innerHTML = `🎉 Today's Birthdays: <b>${names}</b> 🎂`;
+        alertDiv.style.display = "block"; // Alert එක පෙන්වන්න
+        alertDiv.style.background = "#fff3e0"; // පොඩි ලස්සන පාටක්
+        alertDiv.style.padding = "10px";
+    } else {
+        alertDiv.style.display = "none"; // අද උපන්දින නැත්නම් පෙන්නන්න එපා
+    }
 }
