@@ -200,28 +200,43 @@ function updatePendingList() {
     }
 }
 // අනිත් සාමාන්‍ය Functions (Edit, Delete, TogglePaid, Mark)
-async function togglePaid(sIdx, month) {
-    if(!students[sIdx].fees) students[sIdx].fees = {};
+async function togglePaid(idx, month) {
+    let s = students[idx];
     
-    let currentStatus = students[sIdx].fees[month];
-    let newStatus = (currentStatus === "Paid") ? "Unpaid" : "Paid";
-    students[sIdx].fees[month] = newStatus;
+    // 1. Payment එක Toggle කරනවා
+    // ඔයාගේ renderStudents එකේ බලන්නේ s.fees[month] නිසා අපි ඒකම පාවිච්චි කරමු
+    if (!s.fees) s.fees = {};
+    
+    if (s.fees[month] === "Paid") {
+        s.fees[month] = "Unpaid";
+    } else {
+        s.fees[month] = "Paid";
+        
+        // 2. "Paid" කරපු වෙලාවට විතරක් රිසිට් එක WhatsApp යවනවා
+        let date = new Date().toLocaleDateString('en-GB'); // DD/MM/YYYY
+        let receiptNo = "RCPT-" + Date.now().toString().slice(-6); 
+        
+        let msg = `━━━━━━━━━━━━━━━━━━━━
+🌟 *EXCELLENCE MATHS CLASS* 🌟
+━━━━━━━━━━━━━━━━━━━━
+*DATE:* ${date}
+*RECEIPT NO:* #${receiptNo}
+━━━━━━━━━━━━━━━━━━━━
+*NAME:* ${s.name}
+*GRADE:* ${s.grade}
+*MONTH:* ${month}
+*FEE:* Rs. ${s.fee}.00
+━━━━━━━━━━━━━━━━━━━━
+*STATUS:* ✅ *SUCCESSFULLY PAID*
+━━━━━━━━━━━━━━━━━━━━
+ස්තුතියි! පන්තියේදී හමුවෙමු.`;
 
-    if (newStatus === "Paid") {
-        let s = students[sIdx];
-        let receiptMsg = `*--- 🧾 PAYMENT RECEIPT ---*\n\n` +
-                         `Student: *${s.name}*\n` +
-                         `Month: *${month}*\n` +
-                         `Amount Paid: *Rs. ${s.fee}* /=\n` +
-                         `Status: *SUCCESSFULLY PAID ✅*\n\n` +
-                         `Thank you for the payment!\n_System Generated Receipt_`;
-
-        if(confirm("ගෙවීම් තහවුරුයි! WhatsApp Receipt එක යවන්නද?")) {
-            window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(receiptMsg)}`, '_blank');
-        }
+        let url = `https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
     }
 
-    saveData();
+    // 3. Data Save කරලා Screen එක Update කරනවා
+    await saveData();
     renderStudents();
 }
 
