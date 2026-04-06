@@ -253,18 +253,21 @@ function copyToClipboard(encodedMsg) {
 function editStudent(idx) {
     let s = students[idx];
     document.getElementById("studentName").value = s.name;
+    document.getElementById("studentDOB").value = s.dob || ""; // උපන්දිනය
     document.getElementById("parentPhone").value = s.phone;
+    document.getElementById("studentGrade").value = s.grade || ""; // ශ්‍රේණිය
     document.getElementById("group").value = s.group;
     document.getElementById("monthlyFee").value = s.fee;
     document.getElementById("editIdx").value = idx;
-    window.scrollTo(0,0);
+    
+    document.getElementById("formTitle").innerText = "📝 Edit Student"; // Title එක මාරු කරනවා
+    window.scrollTo(0,0); // Page එක උඩටම යනවා ලේසි වෙන්න
 }
-
 function addOrUpdateStudent() {
     let name = document.getElementById("studentName").value;
     let dob = document.getElementById("studentDOB").value;
     let phone = document.getElementById("parentPhone").value;
-    let grade = document.getElementById("studentGrade").value; // Grade එක ගන්නවා
+    let grade = document.getElementById("studentGrade").value;
     let group = document.getElementById("group").value;
     let fee = document.getElementById("monthlyFee").value;
     let editIdx = document.getElementById("editIdx").value;
@@ -272,9 +275,10 @@ function addOrUpdateStudent() {
     if(name === "" || phone === "") { alert("සම්පූර්ණ විස්තර ඇතුළත් කරන්න"); return; }
 
     if(editIdx === "") {
-        students.push({ name, phone, grade, group, fee, dob, marks: {}, attendance: {}, fees: {} }); // 👈 dob එක මෙතනට දාන්න
+        // අලුත් ළමයෙක්
+        students.push({ name, phone, grade, group, fee, dob, marks: {}, attendance: {}, fees: {} });
     } else {
-        // පරණ දත්ත වලට grade එක එකතු කරනවා
+        // කලින් හිටපු ළමයෙක්ව Update කිරීම
         students[editIdx].name = name;
         students[editIdx].dob = dob;
         students[editIdx].phone = phone;
@@ -284,15 +288,16 @@ function addOrUpdateStudent() {
         document.getElementById("editIdx").value = "";
         document.getElementById("formTitle").innerText = "+ Add Student";
     }
+    
     saveData(); 
     renderStudents();
     checkBirthdays();
     
-    // ලිස්ට් එක හිස් කරනවා
+    // Input fields හිස් කරනවා
     document.getElementById("studentName").value = "";
+    document.getElementById("studentDOB").value = "";
     document.getElementById("parentPhone").value = "";
     document.getElementById("monthlyFee").value = "";
-    document.getElementById("studentGrade").value = "";
 }
 function updateIncomeSummary(dataToShow) {
     // dataToShow තිබුණොත් ඒක ගන්නවා, නැත්නම් ඔක්කොම ශිෂ්‍යයෝ (students) ගන්නවා
