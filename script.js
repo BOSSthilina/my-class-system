@@ -385,3 +385,47 @@ async function sendBulkProgress() {
 
     statusDiv.innerText = "✅ සියලුම මැසේජ් යවා අවසන්!";
 }
+async function sendBulk3WeekReminders() {
+    let month = document.getElementById("monthSelect").value;
+    let search = document.getElementById("searchBar").value.toLowerCase();
+    let selectedGrade = document.getElementById("gradeFilter").value;
+    let selectedGroup = document.getElementById("groupFilter").value;
+
+    // 1. දැනට Filter කරලා ඉන්න ලිස්ට් එක මුලින් ගන්නවා
+    let listToFilter = students.filter(s => {
+        let matchesSearch = (s.name || "").toLowerCase().includes(search);
+        let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
+        let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup);
+        return matchesSearch && matchesGrade && matchesGroup;
+    });
+
+    // 2. ඒ අයගෙන් "සති 3ක් පැමිණි" සහ "සල්ලි නොගෙවූ" අයව විතරක් වෙන් කරගන්නවා
+    let listToSend = listToFilter.filter(s => {
+        let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
+        let isUnpaid = (s.fees?.[month] !== "Paid");
+        return attendanceCount >= 3 && isUnpaid;
+    });
+
+    if (listToSend.length === 0) return alert("සති 3ක් සම්පූර්ණ කළ, ගෙවීම් පැහැර හැර ඇති සිසුන් මෙම ලිස්ට් එකේ නැත!");
+
+    if (!confirm(`${listToSend.length} දෙනෙකුට Reminder මැසේජ් යවන්නද?`)) return;
+
+    let statusDiv = document.getElementById("bulkStatus");
+
+    for (let i = 0; i < listToSend.length; i++) {
+        let s = listToSend[i];
+        
+        let msg = `දෙමාපියන්ගේ අවධානය පිණිසයි,\n\n` +
+                  `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 3ක් හෝ ඊට වැඩි ප්‍රමාණයක් පන්තියට පැමිණ ඇතත්, අදාළ මාසය සඳහා ගාස්තු ගෙවා ඇති බව පද්ධතියේ සටහන්ව නොමැත.\n\n` +
+                  `කරුණාකර ඒ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
+
+        statusDiv.innerText = `Sending Reminder to ${s.name} (${i + 1}/${listToSend.length})...`;
+
+        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+
+        // WhatsApp එකට පහසු වෙන්න තත්පර 10ක Delay එකක්
+        await new Promise(resolve => setTimeout(resolve, 10000));
+    }
+
+    statusDiv.innerText = "✅ සියලුම Reminders යවා අවසන්!";
+}
