@@ -42,7 +42,10 @@ function renderStudents() {
     // 3. දැන් ලිස්ට් එක පෙන්වනවා
     filteredList.forEach((s) => {
         let sIdx = students.indexOf(s);
-        let rank = rankedStudents.findIndex(rs => rs.name === s.name) + 1;
+        // 1. මේ ශිෂ්‍යයාගේ Grade එකේ අය විතරක් අරන් rank එක බලනවා
+        let sameGradeStudents = students.filter(st => st.grade === s.grade);
+        let rankedInGrade = [...sameGradeStudents].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
+        let rank = rankedInGrade.findIndex(rs => rs.name === s.name) + 1;
         
         if(!s.attendance) s.attendance = {};
         if(!s.attendance[month]) s.attendance[month] = ["-","-","-","-"];
@@ -120,38 +123,34 @@ function send3WeekRemind(idx, month) {
 }
 
 // රෑන්ක් එකත් එක්ක ප්‍රගති වාර්තාව යැවීම
-function sendProgress(idx, month, rank) {
+function sendProgress(idx, month) {
     let s = students[idx];
-    let att = s.attendance[month].filter(a => a === 'P').length;
-    let score = s.marks[month] || 0;
-    let paidStatus = (s.fees && s.fees[month] === "Paid") ? "Paid ✅" : "Pending ❌";
+    let score = s.marks?.[month] || 0;
 
-    // ලකුණු අනුව මුළු පන්තියම පිළිවෙලට සකස් කිරීම (Top 3 හොයාගන්න)
-    let rankedAll = [...students]
-        .filter(st => st.group === s.group) // ඒ පන්තියේ ළමයි විතරක් ගන්නවා
-        .sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
+    // පන්තිය (Grade) අනුව Rank එක සහ Top 3 ලකුණු හොයනවා
+    let sameGradeStudents = students.filter(st => st.grade === s.grade);
+    let rankedInGrade = [...sameGradeStudents].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
+    
+    let rank = rankedInGrade.findIndex(rs => rs.name === s.name) + 1;
+    let first = rankedInGrade[0] ? (rankedInGrade[0].marks?.[month] || 0) : "0";
+    let second = rankedInGrade[1] ? (rankedInGrade[1].marks?.[month] || 0) : "0";
+    let third = rankedInGrade[2] ? (rankedInGrade[2].marks?.[month] || 0) : "0";
 
-    let first = rankedAll[0] ? `${rankedAll[0].marks[month] || 0}` : "0";
-    let second = rankedAll[1] ? `${rankedAll[1].marks[month] || 0}` : "0";
-    let third = rankedAll[2] ? `${rankedAll[2].marks[month] || 0}` : "0";
-
-    // WhatsApp මැසේජ් එකේ අලුත් පෙනුම
+    // WhatsApp Message Format
     let msg = `Student: *${s.name}*\n` +
               `Grade: *${s.grade || 'N/A'}*\n` +
               `--------------------------\n` +
               `🏆 Your Child's Score: *${score}*\n` +
               `📊 Class Rank: *${rank}*\n\n` +
-              `📈 Class Performance (${s.group}):\n` +
+              `📈 Class Performance (${s.grade}):\n` +
               `- 🥇 1st Place: ${first}\n` +
               `- 🥈 2nd Place: ${second}\n` +
               `- 🥉 3rd Place: ${third}\n` +
-              `--------------------------\n` +
-              
+              `--------------------------\n\n` +
               `Thank you!`;
 
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
-
 // සල්ලි ගෙවපු නැති අයගේ ලිස්ට් එක (Pending List)
 function updatePendingList() {
     let month = document.getElementById("monthSelect").value;
