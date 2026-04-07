@@ -234,3 +234,10 @@ body.dark-mode .stat-box small {
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     border-top: 3px solid #2980b9;
 }
+/* පෙන්ඩින් ලිස්ට් එකේ නම් ටික පේන්න අලුතින් එකතු කළා */
+#pendingDisplay pre {
+    color: #2c3e50 !important; 
+    background-color: #f9f9f9 !important; 
+    font-weight: 500;
+    white-space: pre-wrap; /* පේළි කැඩෙන්න */
+}
