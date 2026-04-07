@@ -187,7 +187,8 @@ function updatePendingList() {
                     <small><b>📌 ${groupName}</b></small>
                     <span style="font-size:10px; color:#e74c3c; font-weight:bold;">${unpaid.length} Pending</span>
                 </div>
-                <pre style="font-size:11px; background:#f9f9f9; padding:8px; border-radius:4px; margin:8px 0; border:1px solid #eee;">${namesList}</pre>
+                // ඔයාගේ කෝඩ් එකේ මේ පේළිය හොයාගන්න:
+                <pre style="font-size:11px; background:#f9f9f9; padding:8px; border-radius:4px; margin:8px 0; border:1px solid #eee; color: black;">${namesList}</pre>
                 <button onclick="copyToClipboard('${encodeURIComponent(waMsg)}')" style="background:#25D366; font-size:11px; padding:6px; width:100%; border-radius:5px;">📋 Copy ${groupName} List</button>
             `;
             display.appendChild(div);
