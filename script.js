@@ -89,6 +89,7 @@ function renderStudents() {
                 </button>
                 <button onclick="send3WeekRemind(${sIdx}, '${month}')" style="background:#f39c12; font-size:12px; padding:8px;">⚠️ Remind</button>
                 <button onclick="sendProgress(${sIdx}, '${month}', ${rank})" style="background:#3498db; font-size:12px; padding:8px;">📊 Rank</button>
+                <button onclick="send4WeekRemind(${sIdx}, '${month}')" style="background:#c0392b; font-size:12px; padding:8px; margin-top:5px;">🚨 4 Week Alert</button>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed #ddd; padding-top: 8px;">
