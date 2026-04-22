@@ -540,3 +540,47 @@ async function sendBulkBirthdays() {
     }
     alert("සියලුම සුබපැතුම් යවා අවසන්!");
 }
+
+function send4WeekRemind(idx, month) {
+    let s = students[idx];
+    
+    // මේ මැසේජ් එකේ සති 4ක් ආපු බව සහ ගෙවීම් ගැන අවධාරණය කරලා තියෙනවා
+    let msg = `*දෙමාපියන්ගේ විශේෂ අවධානය පිණිසයි,* \n\n` +
+              `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 4ක්ම පන්තියට සහභාගී වී ඇත.\n\n` +
+              `නමුත් පද්ධතියට අනුව එම මාසය සඳහා වන ගාස්තු තවමත් ගෙවා ඇති බව සටහන් වී නොමැත. කරුණාකර අද දින මේ පිළිබඳව සොයා බලා කටයුතු කරන ලෙස කාරුණිකව දන්වා සිටිමු. \n\n` +
+              `ස්තූතියි! \n*Excellence Maths Class*`;
+
+    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+async function sendBulk4WeekReminders() {
+    let month = document.getElementById("monthSelect").value;
+    
+    // සති 4ක් ආපු, හැබැයි සල්ලි නොගෙවපු (Paid නැති) අයව විතරක් තෝරාගන්නවා
+    let listToSend = students.filter(s => {
+        let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
+        let isUnpaid = (s.fees?.[month] !== "Paid");
+        return attendanceCount >= 4 && isUnpaid;
+    });
+
+    if (listToSend.length === 0) return alert("සති 4ම සම්පූර්ණ කළ, ගෙවීම් පැහැර හැර ඇති සිසුන් මෙම ලිස්ට් එකේ නැත!");
+
+    if (!confirm(`${listToSend.length} දෙනෙකුට 4-Week Alert එක යවන්නද?`)) return;
+
+    let statusDiv = document.getElementById("bulkStatus");
+
+    for (let i = 0; i < listToSend.length; i++) {
+        let s = listToSend[i];
+        let msg = `*විශේෂ මතක් කිරීමයි - Excellence Maths Class*\n\n` +
+                  `දරුවා: *${s.name}*\n` +
+                  `ඔබගේ දරුවා ${month} මාසයේ සති 4ක්ම පන්තියට පැමිණ ඇතත්, ගාස්තු ගෙවා ඇති බව සටහන්ව නැත. කරුණාකර මේ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
+
+        statusDiv.innerText = `Sending to ${s.name} (${i + 1}/${listToSend.length})...`;
+        
+        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        
+        // WhatsApp Block නොවෙන්න තත්පර 10ක විවේකයක් දෙනවා
+        await new Promise(resolve => setTimeout(resolve, 10000));
+    }
+    statusDiv.innerText = "✅ සියලුම 4-Week Alerts යවා අවසන්!";
+}
