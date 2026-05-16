@@ -474,7 +474,7 @@ async function sendBulk3WeekReminders() {
 }
 function exportToExcel() {
     // Column names ටික මුලින් දාගන්නවා
-    let csvContent = "data:text/csv;charset=utf-8,Name,Phone,Grade,Group,Monthly Fee\n";
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFFName,Phone,Grade,Group,Monthly Fee\n";
     
     students.forEach(s => {
         // ඔයා ලියපු ලයින් එක මෙතනට එන්නේ:
