@@ -8,6 +8,7 @@
 </head>
 <body>
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+    
     <div id="loginBox" class="card">
         <h2>Admin Login</h2>
         <input type="text" id="username" placeholder="Username">
@@ -17,7 +18,14 @@
 
     <div id="mainContent" style="display:none;">
         
-        <div class="card">
+        <div class="navbar" style="display: flex; justify-content: space-around; background: #2c3e50; padding: 12px; border-radius: 8px; margin-bottom: 20px; flex-wrap: wrap; gap: 5px;">
+            <button onclick="showSection('addStudentSection')" style="background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">➕ Add Student</button>
+            <button onclick="showSection('summarySection')" style="background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">📊 Dashboard & Bulk</button>
+            <button onclick="showSection('pendingSection')" style="background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">⚠️ Pending</button>
+            <button onclick="showSection('studentListSection')" style="background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">👥 Student List</button>
+        </div>
+        
+        <div class="card nav-section" id="addStudentSection">
             <h3 id="formTitle">+ Add Student</h3>
             <input type="hidden" id="editIdx">
             <input type="text" id="studentName" placeholder="Student Name">
@@ -52,105 +60,110 @@
             <input type="number" id="monthlyFee" placeholder="Monthly Fee (Rs.)">
             <button id="saveBtn" onclick="addOrUpdateStudent()">Save Student</button>
         </div>
-<div class="card">
-            <input type="text" id="searchBar" placeholder="🔍 Search Name..." onkeyup="renderStudents()">
-            
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <select id="monthSelect" onchange="renderStudents()" style="flex: 1; padding: 10px;">
-                    <option value="January">January</option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May" selected>May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
-                    <option value="September">September</option>
-                    <option value="October">October</option>
-                    <option value="November">November</option>
-                    <option value="December">December</option>
-                </select>
 
-                <select id="gradeFilter" onchange="renderStudents()" style="flex: 1; padding: 10px;">
-                    <option value="All">All Grades (ඔක්කොම)</option>
-                    <option value="Grade 6">Grade 6</option>
-                    <option value="Grade 7">Grade 7</option>
-                    <option value="Grade 8">Grade 8</option>
-                    <option value="Grade 9">Grade 9</option>
-                    <option value="Grade 10">Grade 10</option>
-                    <option value="Grade 11">Grade 11</option>
-                </select>
-            </div>
-            <select id="groupFilter" onchange="renderStudents()" style="width: 100%; padding: 10px;">
-                <option value="All">All Groups (ඔක්කොම පන්ති)</option>
-                <option value="Grade 6 New">Grade 6 New</option>
-                <option value="Grade 7 Saturday 8:30-10:30">Grade 7 Saturday 8:30-10:30</option>
-                <option value="Grade 8 Tuesday 3:00-5:00">Grade 8 Tuesday 3:00-5:00</option>
-                <option value="Grade 8 Sunday 2:30-4:30">Grade 8 Sunday 2:30-4:30</option>
-                <option value="Grade 8 Monday 3:00-5:00">Grade 8 Monday 3:00-5:00</option>
-                <option value="Grade 9 Maths Sunday 8:30-10:30">Grade 9 Maths Sunday 8:30-10:30</option>
-                <option value="Grade 9 Maths Saturday 2:30-4:30">Grade 9 Maths Saturday 2:30-4:30</option>
-                <option value="Grade 9 Maths Monday 8:30-10:30">Grade 9 Maths Monday 8:30-10:30</option>
-                 <option value="Grade 10 Thursday 3:00-5:00">Grade 10 Thursday 3:00-5:00</option>
-                <option value="Grade 10 Wednesday 3:00-5:00">Grade 10 Wednesday 3:00-5:00</option>
-                <option value="Grade 11 Saturday 6:00-8:00">Grade 11 Saturday 6:00-8:00</option>
-                <option value="Individual Class">Individual Class</option>
-            </select>
-        </div> 
+        <div class="nav-section" id="summarySection">
+            <div class="card">
+                <input type="text" id="searchBar" placeholder="🔍 Search Name..." onkeyup="renderStudents()">
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <select id="monthSelect" onchange="renderStudents()" style="flex: 1; padding: 10px;">
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May" selected>May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
 
-                    <div class="card" id="incomeSummary" style="background: #f8f9fa; border-left: 8px solid #2980b9; margin-bottom: 20px;">
-                        <h3 style="color: #2980b9; margin-top: 0;">📊 Class Summary (<span id="summaryMonth">-</span>)</h3>
-                        
-                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                            <div class="stat-box">
-                                <small>Total Expected</small><br>
-                                <b id="totalExpected" style="color: #2c3e50;">Rs. 0</b>
-                            </div>
-                            <div class="stat-box">
-                                <small>Collected</small><br>
-                                <b id="totalCollected" style="color: #27ae60;">Rs. 0</b>
-                            </div>
-                            <div class="stat-box">
-                                <small>Pending</small><br>
-                                <b id="totalPending" style="color: #e74c3c;">Rs. 0</b>
-                            </div>
-                            <div class="stat-box" style="border-top: 3px solid #9b59b6;">
-                                <small>Total Students</small><br>
-                                <b id="totalStudentsCount" style="color: #8e44ad; font-size: 1.2em;">0</b>
-                            </div>
-                        </div>
-                    
-                        <div id="gradeCounts" style="margin-top: 15px; font-size: 13px; color: #555; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; border-top: 1px solid #ddd; padding-top: 10px;">
-                            </div>
+                    <select id="gradeFilter" onchange="renderStudents()" style="flex: 1; padding: 10px;">
+                        <option value="All">All Grades (ඔක්කොම)</option>
+                        <option value="Grade 6">Grade 6</option>
+                        <option value="Grade 7">Grade 7</option>
+                        <option value="Grade 8">Grade 8</option>
+                        <option value="Grade 9">Grade 9</option>
+                        <option value="Grade 10">Grade 10</option>
+                        <option value="Grade 11">Grade 11</option>
+                    </select>
+                </div>
+                <select id="groupFilter" onchange="renderStudents()" style="width: 100%; padding: 10px; margin-top: 10px;">
+                    <option value="All">All Groups (ඔක්කොම පන්ති)</option>
+                    <option value="Grade 6 New">Grade 6 New</option>
+                    <option value="Grade 7 Saturday 8:30-10:30">Grade 7 Saturday 8:30-10:30</option>
+                    <option value="Grade 8 Tuesday 3:00-5:00">Grade 8 Tuesday 3:00-5:00</option>
+                    <option value="Grade 8 Sunday 2:30-4:30">Grade 8 Sunday 2:30-4:30</option>
+                    <option value="Grade 8 Monday 3:00-5:00">Grade 8 Monday 3:00-5:00</option>
+                    <option value="Grade 9 Maths Sunday 8:30-10:30">Grade 9 Maths Sunday 8:30-10:30</option>
+                    <option value="Grade 9 Maths Saturday 2:30-4:30">Grade 9 Maths Saturday 2:30-4:30</option>
+                    <option value="Grade 9 Maths Monday 8:30-10:30">Grade 9 Maths Monday 8:30-10:30</option>
+                    <option value="Grade 10 Thursday 3:00-5:00">Grade 10 Thursday 3:00-5:00</option>
+                    <option value="Grade 10 Wednesday 3:00-5:00">Grade 10 Wednesday 3:00-5:00</option>
+                    <option value="Grade 11 Saturday 6:00-8:00">Grade 11 Saturday 6:00-8:00</option>
+                    <option value="Individual Class">Individual Class</option>
+                </select>
+            </div> 
+
+            <div class="card" id="incomeSummary" style="background: #f8f9fa; border-left: 8px solid #2980b9; margin-bottom: 20px;">
+                <h3 style="color: #2980b9; margin-top: 0;">📊 Class Summary (<span id="summaryMonth">-</span>)</h3>
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div class="stat-box">
+                        <small>Total Expected</small><br>
+                        <b id="totalExpected" style="color: #2c3e50;">Rs. 0</b>
                     </div>
-                        <div class="card" style="text-align: center; border-top: 5px solid #25D366; margin-bottom: 20px;">
-                            <h4 style="margin-bottom: 5px;">Bulk Progress Sender (WhatsApp)</h4>
-                            <p style="font-size: 12px; color: gray; margin-bottom: 15px;">දැනට ලිස්ට් එකේ ඉන්න සියලුම දෙනාට ලකුණු සහ රෑන්ක් එක යවන්න.</p>
-                            
-                            <button onclick="sendBulkProgress()" style="background: #25D366; width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;">
-                                🚀 Send All Progress Reports
-                            </button>
+                    <div class="stat-box">
+                        <small>Collected</small><br>
+                        <b id="totalCollected" style="color: #27ae60;">Rs. 0</b>
+                    </div>
+                    <div class="stat-box">
+                        <small>Pending</small><br>
+                        <b id="totalPending" style="color: #e74c3c;">Rs. 0</b>
+                    </div>
+                    <div class="stat-box" style="border-top: 3px solid #9b59b6;">
+                        <small>Total Students</small><br>
+                        <b id="totalStudentsCount" style="color: #8e44ad; font-size: 1.2em;">0</b>
+                    </div>
+                </div>
+                <div id="gradeCounts" style="margin-top: 15px; font-size: 13px; color: #555; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; border-top: 1px solid #ddd; padding-top: 10px;"></div>
+            </div>
 
-                            <button onclick="sendBulk3WeekReminders()" style="background: #f39c12; width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 10px;">
-                                ⚠️ Send Bulk 3-Week Reminders
-                            </button>
-                            
-                            <button onclick="sendBulk4WeekReminders()" style="background:#c0392b; color:white; padding:10px; border-radius:5px; margin-bottom:10px;">🚨 Send Bulk 4-Week Alerts</button>
-                            <div id="bulkStatus" style="color:#e74c3c; font-weight:bold; margin-bottom:10px;"></div>
-                            <div id="bulkStatus" style="margin-top: 12px; font-size: 13px; font-weight: bold; color: #2c3e50;"></div>
-                            <button onclick="exportToExcel()" style="background: #34495e; margin-top: 10px;">
-                                📥 Export Student List (Excel/CSV)
-                            </button>
-                                
-                             <div id="birthdayAlert" style="margin-top:10px; color:#e67e22; font-weight:bold; font-size:13px;"></div>
-                        </div>
+            <div class="card" style="text-align: center; border-top: 5px solid #25D366; margin-bottom: 20px;">
+                <h4 style="margin-bottom: 5px;">Bulk Progress Sender (WhatsApp)</h4>
+                <p style="font-size: 12px; color: gray; margin-bottom: 15px;">දැනට ලිස්ට් එකේ ඉන්න සියලුම දෙනාට ලකුණු සහ රෑන්ක් එක යවන්න.</p>
+                
+                <button onclick="sendBulkProgress()" style="background: #25D366; width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-bottom: 10px;">
+                    🚀 Send All Progress Reports
+                </button>
+
+                <button onclick="sendBulk3WeekReminders()" style="background: #f39c12; width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-bottom: 10px;">
+                    ⚠️ Send Bulk 3-Week Reminders
+                </button>
+                
+                <button onclick="sendBulk4WeekReminders()" style="background: #c0392b; width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-bottom: 10px;">
+                    🚨 Send Bulk 4-Week Alerts
+                </button>
+
+                <div id="bulkStatus" style="margin-top: 12px; font-size: 13px; font-weight: bold; color: #e74c3c;"></div>
+                
+                <button onclick="exportToExcel()" style="background: #34495e; margin-top: 10px; width: 100%; padding: 10px; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    📥 Export Student List (Excel/CSV)
+                </button>
                     
-        <div class="card" id="pendingSection" style="border: 2px solid #e74c3c;">
+                <div id="birthdayAlert" style="margin-top:10px; color:#e67e22; font-weight:bold; font-size:13px;"></div>
+            </div>
+        </div>
+                    
+        <div class="card nav-section" id="pendingSection" style="border: 2px solid #e74c3c;">
             <h3 style="color: #e74c3c;">⚠️ Pending Payments (ගාස්තු ගෙවීමට ඇති අය)</h3>
             <div id="pendingDisplay"></div>
         </div>
 
-        <div id="studentList"></div>
+        <div class="nav-section" id="studentListSection">
+            <div id="studentList"></div>
+        </div>
 
     </div>
 
