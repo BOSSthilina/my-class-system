@@ -25,25 +25,36 @@
             <button onclick="showSection('studentListSection')" style="background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">👥 Student List</button>
         </div>
         
-        <div class="card nav-section" id="addStudentSection">
-            <h3 id="formTitle">+ Add Student</h3>
-            <input type="hidden" id="editIdx">
-            <input type="text" id="studentName" placeholder="Student Name">
-            <input type="text" id="parentPhone" placeholder="947XXXXXXXX">
-            <label style="font-size: 12px; color: gray;">Birthday (Optional):</label>
-            <input type="date" id="studentDOB">
+        <div class="card" style="margin-bottom: 20px;">
+            <input type="text" id="searchBar" placeholder="🔍 Search Name..." onkeyup="renderStudents()">
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <select id="monthSelect" onchange="renderStudents()" style="flex: 1; padding: 10px;">
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May" selected>May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
 
-            <select id="studentGrade">
-                <option value="Grade 6">Grade 6</option>
-                <option value="Grade 7">Grade 7</option>
-                <option value="Grade 8">Grade 8</option>
-                <option value="Grade 9">Grade 9</option>
-                <option value="Grade 10">Grade 10</option>
-                <option value="Grade 11">Grade 11</option>
-                <option value="Other">Other</option>
-            </select>
-            
-            <select id="group">
+                <select id="gradeFilter" onchange="renderStudents()" style="flex: 1; padding: 10px;">
+                    <option value="All">All Grades (ඔක්කොම)</option>
+                    <option value="Grade 6">Grade 6</option>
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 9">Grade 9</option>
+                    <option value="Grade 10">Grade 10</option>
+                    <option value="Grade 11">Grade 11</option>
+                </select>
+            </div> 
+            <select id="groupFilter" onchange="renderStudents()" style="width: 100%; padding: 10px; margin-top: 10px;">
+                <option value="All">All Groups (ඔක්කොම පන්ති)</option>
                 <option value="Grade 6 New">Grade 6 New</option>
                 <option value="Grade 7 Saturday 8:30-10:30">Grade 7 Saturday 8:30-10:30</option>
                 <option value="Grade 8 Tuesday 3:00-5:00">Grade 8 Tuesday 3:00-5:00</option>
@@ -57,82 +68,75 @@
                 <option value="Grade 11 Saturday 6:00-8:00">Grade 11 Saturday 6:00-8:00</option>
                 <option value="Individual Class">Individual Class</option>
             </select>
+        </div> 
+
+        <div id="birthdayAlert" style="margin-bottom: 20px; display: none;"></div>
+
+        <div class="card nav-section" id="addStudentSection">
+            <h3 id="formTitle">+ Add New Student</h3>
+            <input type="hidden" id="editIdx">
+            <input type="text" id="studentName" placeholder="Student Name">
+            <input type="date" id="studentDOB" placeholder="Date of Birth">
+            <input type="text" id="parentPhone" placeholder="Parent WhatsApp Phone (e.g. 94771234567)">
+            
+            <select id="studentGrade" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+                <option value="">Select Grade</option>
+                <option value="Grade 6">Grade 6</option>
+                <option value="Grade 7">Grade 7</option>
+                <option value="Grade 8">Grade 8</option>
+                <option value="Grade 9">Grade 9</option>
+                <option value="Grade 10">Grade 10</option>
+                <option value="Grade 11">Grade 11</option>
+            </select>
+
+            <select id="group" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+                <option value="">Select Class Group</option>
+                <option value="Grade 6 New">Grade 6 New</option>
+                <option value="Grade 7 Saturday 8:30-10:30">Grade 7 Saturday 8:30-10:30</option>
+                <option value="Grade 8 Tuesday 3:00-5:00">Grade 8 Tuesday 3:00-5:00</option>
+                <option value="Grade 8 Sunday 2:30-4:30">Grade 8 Sunday 2:30-4:30</option>
+                <option value="Grade 8 Monday 3:00-5:00">Grade 8 Monday 3:00-5:00</option>
+                <option value="Grade 9 Maths Sunday 8:30-10:30">Grade 9 Maths Sunday 8:30-10:30</option>
+                <option value="Grade 9 Maths Saturday 2:30-4:30">Grade 9 Maths Saturday 2:30-4:30</option>
+                <option value="Grade 9 Maths Monday 8:30-10:30">Grade 9 Maths Monday 8:30-10:30</option>
+                <option value="Grade 10 Thursday 3:00-5:00">Grade 10 Thursday 3:00-5:00</option>
+                <option value="Grade 10 Wednesday 3:00-5:00">Grade 10 Wednesday 3:00-5:00</option>
+                <option value="Grade 11 Saturday 6:00-8:00">Grade 11 Saturday 6:00-8:00</option>
+                <option value="Individual Class">Individual Class</option>
+            </select>
+
             <input type="number" id="monthlyFee" placeholder="Monthly Fee (Rs.)">
-            <button id="saveBtn" onclick="addOrUpdateStudent()">Save Student</button>
+            <button onclick="addOrUpdateStudent()" style="background: #27ae60;">Save Student</button>
         </div>
 
         <div class="nav-section" id="summarySection">
-            <div class="card">
-                <input type="text" id="searchBar" placeholder="🔍 Search Name..." onkeyup="renderStudents()">
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <select id="monthSelect" onchange="renderStudents()" style="flex: 1; padding: 10px;">
-                        <option value="January">January</option>
-                        <option value="February">February</option>
-                        <option value="March">March</option>
-                        <option value="April">April</option>
-                        <option value="May" selected>May</option>
-                        <option value="June">June</option>
-                        <option value="July">July</option>
-                        <option value="August">August</option>
-                        <option value="September">September</option>
-                        <option value="October">October</option>
-                        <option value="November">November</option>
-                        <option value="December">December</option>
-                    </select>
-
-                    <select id="gradeFilter" onchange="renderStudents()" style="flex: 1; padding: 10px;">
-                        <option value="All">All Grades (ඔක්කොම)</option>
-                        <option value="Grade 6">Grade 6</option>
-                        <option value="Grade 7">Grade 7</option>
-                        <option value="Grade 8">Grade 8</option>
-                        <option value="Grade 9">Grade 9</option>
-                        <option value="Grade 10">Grade 10</option>
-                        <option value="Grade 11">Grade 11</option>
-                    </select>
-                </div>
-                <select id="groupFilter" onchange="renderStudents()" style="width: 100%; padding: 10px; margin-top: 10px;">
-                    <option value="All">All Groups (ඔක්කොම පන්ති)</option>
-                    <option value="Grade 6 New">Grade 6 New</option>
-                    <option value="Grade 7 Saturday 8:30-10:30">Grade 7 Saturday 8:30-10:30</option>
-                    <option value="Grade 8 Tuesday 3:00-5:00">Grade 8 Tuesday 3:00-5:00</option>
-                    <option value="Grade 8 Sunday 2:30-4:30">Grade 8 Sunday 2:30-4:30</option>
-                    <option value="Grade 8 Monday 3:00-5:00">Grade 8 Monday 3:00-5:00</option>
-                    <option value="Grade 9 Maths Sunday 8:30-10:30">Grade 9 Maths Sunday 8:30-10:30</option>
-                    <option value="Grade 9 Maths Saturday 2:30-4:30">Grade 9 Maths Saturday 2:30-4:30</option>
-                    <option value="Grade 9 Maths Monday 8:30-10:30">Grade 9 Maths Monday 8:30-10:30</option>
-                    <option value="Grade 10 Thursday 3:00-5:00">Grade 10 Thursday 3:00-5:00</option>
-                    <option value="Grade 10 Wednesday 3:00-5:00">Grade 10 Wednesday 3:00-5:00</option>
-                    <option value="Grade 11 Saturday 6:00-8:00">Grade 11 Saturday 6:00-8:00</option>
-                    <option value="Individual Class">Individual Class</option>
-                </select>
-            </div> 
-
-            <div class="card" id="incomeSummary" style="background: #f8f9fa; border-left: 8px solid #2980b9; margin-bottom: 20px;">
-                <h3 style="color: #2980b9; margin-top: 0;">📊 Class Summary (<span id="summaryMonth">-</span>)</h3>
-                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                    <div class="stat-box">
-                        <small>Total Expected</small><br>
-                        <b id="totalExpected" style="color: #2c3e50;">Rs. 0</b>
+            <div class="card" id="incomeSummary" style="background: #f8f9fa; border-left: 8px solid #2980b9; margin-bottom: 20px; color: black;">
+                <h3>📊 Class Summary (<span id="summaryMonth">May</span>)</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; text-align: center;">
+                    <div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                        <small style="color: gray;">Total Expected</small>
+                        <h4 id="totalExpected" style="margin: 5px 0 0 0; color: #2c3e50;">Rs. 0</h4>
                     </div>
-                    <div class="stat-box">
-                        <small>Collected</small><br>
-                        <b id="totalCollected" style="color: #27ae60;">Rs. 0</b>
+                    <div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                        <small style="color: gray;">Collected</small>
+                        <h4 id="totalCollected" style="margin: 5px 0 0 0; color: #27ae60;">Rs. 0</h4>
                     </div>
-                    <div class="stat-box">
-                        <small>Pending</small><br>
-                        <b id="totalPending" style="color: #e74c3c;">Rs. 0</b>
+                    <div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                        <small style="color: gray;">Pending</small>
+                        <h4 id="totalPending" style="margin: 5px 0 0 0; color: #c0392b;">Rs. 0</h4>
                     </div>
-                    <div class="stat-box" style="border-top: 3px solid #9b59b6;">
-                        <small>Total Students</small><br>
-                        <b id="totalStudentsCount" style="color: #8e44ad; font-size: 1.2em;">0</b>
+                    <div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                        <small style="color: gray;">Total Students</small>
+                        <h4 id="totalStudentsCount" style="margin: 5px 0 0 0; color: #8e44ad;">0</h4>
                     </div>
                 </div>
-                <div id="gradeCounts" style="margin-top: 15px; font-size: 13px; color: #555; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; border-top: 1px solid #ddd; padding-top: 10px;"></div>
+                <div id="gradeCounts" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; font-size: 11px; font-weight: bold; color: #555;">
+                    </div>
             </div>
 
             <div class="card" style="text-align: center; border-top: 5px solid #25D366; margin-bottom: 20px;">
-                <h4 style="margin-bottom: 5px;">Bulk Progress Sender (WhatsApp)</h4>
-                <p style="font-size: 12px; color: gray; margin-bottom: 15px;">දැනට ලිස්ට් එකේ ඉන්න සියලුම දෙනාට ලකුණු සහ රෑන්ක් එක යවන්න.</p>
+                <h4 style="margin-bottom: 5px;">Bulk Actions Panel (WhatsApp & Excel)</h4>
+                <p style="font-size: 12px; color: gray; margin-bottom: 15px;">දැනට තෝරාගෙන ඇති ලිස්ට් එකට අනුව ක්‍රියාත්මක වේ.</p>
                 
                 <button onclick="sendBulkProgress()" style="background: #25D366; width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-bottom: 10px;">
                     🚀 Send All Progress Reports
@@ -151,13 +155,11 @@
                 <button onclick="exportToExcel()" style="background: #34495e; margin-top: 10px; width: 100%; padding: 10px; color: white; border: none; border-radius: 5px; cursor: pointer;">
                     📥 Export Student List (Excel/CSV)
                 </button>
-                    
-                <div id="birthdayAlert" style="margin-top:10px; color:#e67e22; font-weight:bold; font-size:13px;"></div>
             </div>
         </div>
-                    
+
         <div class="card nav-section" id="pendingSection" style="border: 2px solid #e74c3c;">
-            <h3 style="color: #e74c3c;">⚠️ Pending Payments (ගාස්තු ගෙවීමට ඇති අය)</h3>
+            <h3 style="color: #e74c3c; margin-top: 0;">⚠️ Pending Payments (ගාස්තු ගෙවීමට ඇති අය)</h3>
             <div id="pendingDisplay"></div>
         </div>
 
