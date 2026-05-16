@@ -17,6 +17,7 @@ function login() {
         document.getElementById("loginBox").style.display = "none";
         document.getElementById("mainContent").style.display = "block";
         loadData();
+        showSection('summarySection'); // 👈 මේ පේළිය අනිවාර්යයෙන්ම තියෙන්න ඕනේ සර්
     }
 }
 
@@ -584,3 +585,31 @@ async function sendBulk4WeekReminders() {
     }
     statusDiv.innerText = "✅ සියලුම 4-Week Alerts යවා අවසන්!";
 }
+function showSection(sectionId) {
+    // හැම section එකක්ම මුලින් හංගනවා
+    document.querySelectorAll('.nav-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // සර් තෝරපු section එක විතරක් මතු කරනවා
+    let activeSection = document.getElementById(sectionId);
+    if (activeSection) {
+        // summarySection සහ studentListSection සාමාන්‍ය div නිසා block දානවා, අනිත් ඒවා card නිසා display එක card කරනවා
+        activeSection.style.display = (sectionId === 'summarySection' || sectionId === 'studentListSection') ? 'block' : 'block';
+    }
+    
+    // ක්ලික් කරපු බටන් එක නිල් පාට කරලා, අනිත් ඒවා තද අළු පාට කරනවා
+    const navButtons = document.querySelectorAll('.navbar button');
+    navButtons.forEach(btn => {
+        if (btn.getAttribute('onclick').includes(sectionId)) {
+            btn.style.background = '#2980b9';
+        } else {
+            btn.style.background = '#34495e';
+        }
+    });
+}
+
+
+
+
+
