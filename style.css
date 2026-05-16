@@ -241,3 +241,6 @@ body.dark-mode .stat-box small {
     font-weight: 500;
     white-space: pre-wrap; /* පේළි කැඩෙන්න */
 }
+.nav-section {
+    transition: all 0.3s ease;
+}
