@@ -5,6 +5,7 @@ body {
     margin: 0; 
     padding: 15px; 
     color: #333;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 /* --- Card එකක පෙනුම --- */
@@ -50,7 +51,14 @@ button:hover { background-color: #2980b9; }
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.student-card h3 { margin: 0 0 5px 0; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+.student-card h3 { 
+    margin: 0 0 5px 0; 
+    font-size: 18px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: flex-start; 
+    gap: 5px; 
+}
 .student-card small { color: #666; display: block; margin-bottom: 10px; }
 
 /* --- පැමිණීම සටහන් කරන බට්න් (P/A/-) --- */
@@ -80,7 +88,10 @@ button:hover { background-color: #2980b9; }
 }
 
 #pendingDisplay pre {
-    background: #fff;
+    color: #2c3e50 !important; 
+    background-color: #f9f9f9 !important; 
+    font-weight: 500;
+    white-space: pre-wrap; /* පේළි කැඩෙන්න */
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #ffdada;
@@ -89,11 +100,6 @@ button:hover { background-color: #2980b9; }
     margin: 10px 0;
 }
 
-/* --- Responsive (Mobile එකට) --- */
-@media (max-width: 480px) {
-    .att-btn { width: 38px; height: 38px; font-size: 12px; }
-    .card { padding: 12px; }
-}
 /* --- Grade එක පෙන්වන ලේබල් එක --- */
 .student-card h3 span {
     background-color: #e3f2fd;
@@ -106,13 +112,6 @@ button:hover { background-color: #2980b9; }
     border: 1px solid #bbdefb;
 }
 
-/* --- Rank එකේ පෙනුම --- */
-.student-card h3 {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 5px;
-}
 select {
     width: 100%;
     padding: 10px;
@@ -120,16 +119,18 @@ select {
     border-radius: 5px;
     background-color: white;
     font-size: 14px;
-    height: 40px; /* උස අනිවාර්යයෙන්ම දෙන්න */
+    height: 40px;
 }
+
 .stat-box {
     background: white;
     padding: 10px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: center;
     flex: 1;
     min-width: 100px;
-    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-top: 3px solid #2980b9;
 }
 
 #gradeCounts span {
@@ -138,7 +139,33 @@ select {
     border-radius: 4px;
     font-weight: bold;
 }
-/* Dark Mode Styles */
+
+.nav-section {
+    transition: all 0.3s ease;
+}
+
+/* ========================================================
+   🆕 අලුත් MODERN HEADER (NAVIGATION) සටහන් - එකතු කළා
+   ======================================================== */
+.main-header {
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.main-header .navbar button {
+    width: auto; /* සාමාන්‍ය බටන් වගේ 100% දිග වෙන්න නොදී ලස්සනට තියාගන්න */
+    transition: all 0.2s ease;
+    border-radius: 6px;
+}
+
+/* Navigation බටන්ස් උඩට Mouse එක ගෙනිච්චම ලස්සන Gray Background එකක් එන්න */
+.main-header .navbar button:hover {
+    background-color: #f3f4f6 !important;
+    color: #111827 !important;
+}
+
+/* ========================================================
+   🌙 DARK MODE STYLES (අලුත් Header එකත් ඇතුළත්ව)
+   ======================================================== */
 body.dark-mode {
     background-color: #121212;
     color: #ffffff;
@@ -172,31 +199,6 @@ body.dark-mode .stat-box b {
     color: #ecf0f1 !important;
 }
 
-/* Dark Mode Button - උඩම කොනක පොඩියට තියෙන්න */
-.dark-mode-toggle {
-    position: absolute; /* පේජ් එකේ උඩම රැඳී සිටින්න */
-    top: 15px;
-    right: 15px;
-    width: 35px; /* ප්‍රමාණය පොඩ්ඩක් අඩු කළා */
-    height: 35px;
-    border-radius: 50%;
-    cursor: pointer;
-    background: #34495e;
-    border: 1.5px solid #ecf0f1;
-    font-size: 16px; /* ඉමෝජි එකේ size එකත් අඩු කළා */
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 1000;
-}
-
-.dark-mode-toggle:hover {
-    transform: scale(1.1);
-    background: #2c3e50;
-}
-
 body.dark-mode #pendingSection {
     background-color: #2c1a1a; 
     border-color: #e74c3c;
@@ -215,32 +217,51 @@ body.dark-mode #pendingDisplay div {
 }
 
 body.dark-mode #pendingDisplay pre {
-    color: #ecf0f1; 
-    background: #1e1e1e; 
+    color: #ecf0f1 !important; 
+    background-color: #1e1e1e !important; 
     padding: 10px;
     border-radius: 5px;
+    border: 1px solid #444;
 }
 
 body.dark-mode .stat-box small {
     color: #bdc3c7;
 }
-.stat-box {
-    background: white;
-    padding: 10px;
-    border-radius: 8px;
-    text-align: center;
-    flex: 1;
-    min-width: 100px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    border-top: 3px solid #2980b9;
+
+/* 🆕 Dark Mode එකේදී අලුත් Header එක කළු වෙන්න ස්ටයිල්ස් */
+body.dark-mode .main-header {
+    background: #1e1e1e !important;
+    border-bottom: 1px solid #333 !important;
 }
-/* පෙන්ඩින් ලිස්ට් එකේ නම් ටික පේන්න අලුතින් එකතු කළා */
-#pendingDisplay pre {
-    color: #2c3e50 !important; 
-    background-color: #f9f9f9 !important; 
-    font-weight: 500;
-    white-space: pre-wrap; /* පේළි කැඩෙන්න */
+
+body.dark-mode .main-header .header-left span {
+    color: #ffffff !important;
 }
-.nav-section {
-    transition: all 0.3s ease;
+
+body.dark-mode .main-header .navbar button {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .main-header .navbar button:hover {
+    background-color: #2c2c2c !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .dark-mode-toggle {
+    background: #2c2c2c !important;
+    border-color: #444 !important;
+}
+
+/* --- Responsive (Mobile එකට) --- */
+@media (max-width: 480px) {
+    .att-btn { width: 38px; height: 38px; font-size: 12px; }
+    .card { padding: 12px; }
+    .main-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    .main-header .navbar {
+        justify-content: center;
+    }
 }
