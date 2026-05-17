@@ -1,6 +1,9 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIpplQGzEDNYZRjfA5A0cb-khoYf4yYLfQUkhD4qtQ3EUKFVxtnTv4cH5M7TPTdHM6/exec";
 let students = [];
 
+// මාස වල අනුපිළිවෙල (Global එකක් විදිහට හැම තැනටම පාවිච්චි කරන්න උඩින්ම දැම්මා)
+const monthsOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
 async function loadData() {
     const res = await fetch(SCRIPT_URL);
     students = await res.json();
@@ -17,7 +20,7 @@ function login() {
         document.getElementById("loginBox").style.display = "none";
         document.getElementById("mainContent").style.display = "block";
         loadData();
-        showSection('summarySection'); // 👈 මේ පේළිය අනිවාර්යයෙන්ම තියෙන්න ඕනේ සර්
+        showSection('summarySection');
     }
 }
 
@@ -26,22 +29,32 @@ function renderStudents() {
     let search = document.getElementById("searchBar").value.toLowerCase();
     let month = document.getElementById("monthSelect").value;
     let selectedGrade = document.getElementById("gradeFilter").value;
-    let selectedGroup = document.getElementById("groupFilter").value; // 👈 අලුත් Group Filter එක ගන්නවා
+    let selectedGroup = document.getElementById("groupFilter").value;
     list.innerHTML = "";
 
-    // 1. Filter කිරීම (Grade එකයි Group එකයි දෙකම බලනවා)
+    let currentMonthIdx = monthsOrder.indexOf(month);
+
+    // 1. Filter කිරීම
     let filteredList = students.filter(s => {
         let matchesSearch = (s.name || "").toLowerCase().includes(search);
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
-        let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup); // 👈 Group එකත් හරිනම් විතරයි ගන්නේ
+        let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup);
         
-        return matchesSearch && matchesGrade && matchesGroup;
+        // 🚀 ළමයා එකතු වුණු මාසය බලනවා
+        let isAvailableInMonth = true;
+        if (s.joinedMonth) {
+            let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
+            if (currentMonthIdx < joinedIdx) {
+                isAvailableInMonth = false;
+            }
+        }
+        
+        return matchesSearch && matchesGrade && matchesGroup && isAvailableInMonth;
     });
-
+    
     // 2. දැන් ලිස්ට් එක පෙන්වනවා
     filteredList.forEach((s) => {
         let sIdx = students.indexOf(s);
-        // 1. මේ ශිෂ්‍යයාගේ Grade එකේ අය විතරක් අරන් rank එක බලනවා
         let sameGradeStudents = students.filter(st => st.grade === s.grade);
         let rankedInGrade = [...sameGradeStudents].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
         let rank = rankedInGrade.findIndex(rs => rs.name === s.name) + 1;
@@ -102,25 +115,21 @@ function renderStudents() {
     updateIncomeSummary(filteredList); 
 }
 
-// ලකුණු සේව් කිරීම
 function saveMarks(sIdx, month) {
     if(!students[sIdx].marks) students[sIdx].marks = {};
     students[sIdx].marks[month] = document.getElementById(`m-${sIdx}`).value;
     saveData();
-    renderStudents(); // රෑන්ක් එක අප්ඩේට් වෙන්න ආයේ රෙන්ඩර් කරනවා
+    renderStudents();
 }
 
-// 3 Week Reminder මැසේජ් එක
 function send3WeekRemind(idx, month) {
     let s = students[idx];
     let msg = `දෙමාපියන්ගේ අවධානය පිණිසයි,\n\n` +
               `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 3ක් පන්තියට පැමිණ ඇතත්, අදාළ මාසය සඳහා ගාස්තු ගෙවා ඇති බව පද්ධතියේ සටහන්ව නොමැත.\n\n` +
               `කරුණාකර ඒ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
-
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
 
-// රෑන්ක් එකත් එක්ක ප්‍රගති වාර්තාව යැවීම
 function sendProgress(idx, month) {
     let s = students[idx];
     let score = s.marks?.[month] || 0;
@@ -148,19 +157,31 @@ function sendProgress(idx, month) {
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
 
-// Pending List එක යාවත්කාලීන කිරීම
 function updatePendingList() {
     let month = document.getElementById("monthSelect").value;
     let selectedGroup = document.getElementById("groupFilter").value;
     let display = document.getElementById("pendingDisplay");
     display.innerHTML = "";
 
+    let currentMonthIdx = monthsOrder.indexOf(month);
+
     let groupsToShow = (selectedGroup === "All") 
         ? [...new Set(students.map(s => s.group))] 
         : [selectedGroup];
 
     groupsToShow.forEach(groupName => {
-        let unpaid = students.filter(s => s.group === groupName && (!s.fees || s.fees[month] !== "Paid"));
+        let unpaid = students.filter(s => {
+            let matchesGroup = s.group === groupName;
+            let isUnpaid = (!s.fees || s.fees[month] !== "Paid");
+            
+            let isAvailableInMonth = true;
+            if (s.joinedMonth) {
+                let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
+                if (currentMonthIdx < joinedIdx) isAvailableInMonth = false;
+            }
+            
+            return matchesGroup && isUnpaid && isAvailableInMonth;
+        });
 
         if (unpaid.length > 0) {
             let namesList = unpaid.map((s, i) => `${i+1}. ${s.name}`).join("\n");
@@ -181,7 +202,7 @@ function updatePendingList() {
                     <span style="font-size:10px; color:#e74c3c; font-weight:bold;">${unpaid.length} Pending</span>
                 </div>
                 <pre style="font-size:11px; background:#f9f9f9; padding:8px; border-radius:4px; margin:8px 0; border:1px solid #eee; color: black;">${namesList}</pre>
-                <button onclick="copyToClipboard('${encodeURIComponent(waMsg)}')" style="background:#25D366; font-size:11px; padding:6px; width:100%; border-radius:5px;">📋 Copy ${groupName} List</button>           `;
+                <button onclick="copyToClipboard('${encodeURIComponent(waMsg)}')" style="background:#25D366; font-size:11px; padding:6px; width:100%; border-radius:5px; color:white; border:none; cursor:pointer;">📋 Copy ${groupName} List</button>           `;
             display.appendChild(div);
         }
     });
@@ -191,7 +212,6 @@ function updatePendingList() {
     }
 }
 
-// Paid/Unpaid මාරු කිරීම සහ Receipt එක හැදීම
 async function togglePaid(idx, month) {
     let s = students[idx];
     if (!s.fees) s.fees = {};
@@ -258,14 +278,18 @@ function addOrUpdateStudent() {
     let group = document.getElementById("group").value;
     let fee = document.getElementById("monthlyFee").value;
     let editIdx = document.getElementById("editIdx").value;
+    
+    let currentMonth = document.getElementById("monthSelect").value;
 
     if(name === "" || phone === "") { alert("සම්පූර්ණ විස්තර ඇතුළත් කරන්න"); return; }
 
     if(editIdx === "") {
-        // අලුත් ළමයෙක්
-        students.push({ name, phone, grade, group, fee, dob, marks: {}, attendance: {}, fees: {} });
+        students.push({ 
+            name, phone, grade, group, fee, dob, 
+            joinedMonth: currentMonth, 
+            marks: {}, attendance: {}, fees: {} 
+        });
     } else {
-        // 👈 කලින් හිටපු ළමයෙක්ව Update කිරීමේදී පරණ Objects ආරක්ෂා කරගන්නවා
         students[editIdx].name = name;
         students[editIdx].dob = dob;
         students[editIdx].phone = phone;
@@ -273,7 +297,6 @@ function addOrUpdateStudent() {
         students[editIdx].group = group;
         students[editIdx].fee = fee;
         
-        // මේවා කලින් නොතිබුනොත් විතරක් හිස් Object එකක් දානවා
         if(!students[editIdx].marks) students[editIdx].marks = {};
         if(!students[editIdx].attendance) students[editIdx].attendance = {};
         if(!students[editIdx].fees) students[editIdx].fees = {};
@@ -360,17 +383,25 @@ window.onload = function() {
     loadData(); 
 };
 
+// 🆕 Bulk functions වලටත් joinedMonth Filter එක දැම්මා
 async function sendBulkProgress() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
     let selectedGrade = document.getElementById("gradeFilter").value;
     let selectedGroup = document.getElementById("groupFilter").value;
+    let currentMonthIdx = monthsOrder.indexOf(month);
 
     let listToSend = students.filter(s => {
         let matchesSearch = (s.name || "").toLowerCase().includes(search);
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
         let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup);
-        return matchesSearch && matchesGrade && matchesGroup;
+        
+        let isAvailableInMonth = true;
+        if (s.joinedMonth) {
+            let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
+            if (currentMonthIdx < joinedIdx) isAvailableInMonth = false;
+        }
+        return matchesSearch && matchesGrade && matchesGroup && isAvailableInMonth;
     });
 
     if (listToSend.length === 0) return alert("යවන්න ළමයි කවුරුත් නැහැ!");
@@ -413,12 +444,19 @@ async function sendBulk3WeekReminders() {
     let search = document.getElementById("searchBar").value.toLowerCase();
     let selectedGrade = document.getElementById("gradeFilter").value;
     let selectedGroup = document.getElementById("groupFilter").value;
+    let currentMonthIdx = monthsOrder.indexOf(month);
 
     let listToFilter = students.filter(s => {
         let matchesSearch = (s.name || "").toLowerCase().includes(search);
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
         let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup);
-        return matchesSearch && matchesGrade && matchesGroup;
+        
+        let isAvailableInMonth = true;
+        if (s.joinedMonth) {
+            let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
+            if (currentMonthIdx < joinedIdx) isAvailableInMonth = false;
+        }
+        return matchesSearch && matchesGrade && matchesGroup && isAvailableInMonth;
     });
 
     let listToSend = listToFilter.filter(s => {
@@ -448,11 +486,9 @@ async function sendBulk3WeekReminders() {
 
 function exportToExcel() {
     let csvContent = "data:text/csv;charset=utf-8,\uFEFFName,Phone,Grade,Group,Monthly Fee\n";
-    
     students.forEach(s => {
         csvContent += `"${s.name}","${s.phone}","${s.grade}","${s.group}","${s.fee}"\n`;
     });
-
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -464,7 +500,6 @@ function exportToExcel() {
 function checkBirthdays() {
     let today = new Date();
     let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
-    
     let alertDiv = document.getElementById("birthdayAlert");
     if (!alertDiv) return;
 
@@ -493,7 +528,6 @@ async function sendBulkBirthdays() {
 
     for (let i = 0; i < birthdaysToday.length; i++) {
         let s = birthdaysToday[i];
-        
         let msg = `\u{1F31F} *HAPPY BIRTHDAY!* \u{1F31F}\n\n` +
                   `ආදරණීය *${s.name}*,\n` +
                   `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! \u{1F382}\u{2728}\n\n` +
@@ -501,7 +535,6 @@ async function sendBulkBirthdays() {
                   `මීට,\n*Thilina Sir*`;
 
         window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-
         if (birthdaysToday.length > 1) {
             await new Promise(r => setTimeout(r, 5000));
         }
@@ -515,17 +548,23 @@ function send4WeekRemind(idx, month) {
               `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 4ක්ම පන්තියට සහභාගී වී ඇත.\n\n` +
               `නමුත් පද්ධතියට අනුව එම මාසය සඳහා වන ගාස්තු තවමත් ගෙවා ඇති බව සටහන් වී නොමැත. කරුණාකර අද දින මේ පිළිබඳව සොයා බලා කටයුතු කරන ලෙස කාරුණිකව දන්වා සිටිමු. \n\n` +
               `ස්තූතියි! \n*Excellence Maths Class*`;
-
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 async function sendBulk4WeekReminders() {
     let month = document.getElementById("monthSelect").value;
+    let currentMonthIdx = monthsOrder.indexOf(month);
     
     let listToSend = students.filter(s => {
         let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
         let isUnpaid = (s.fees?.[month] !== "Paid");
-        return attendanceCount >= 4 && isUnpaid;
+        
+        let isAvailableInMonth = true;
+        if (s.joinedMonth) {
+            let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
+            if (currentMonthIdx < joinedIdx) isAvailableInMonth = false;
+        }
+        return attendanceCount >= 4 && isUnpaid && isAvailableInMonth;
     });
 
     if (listToSend.length === 0) return alert("සති 4ම සම්පූර්ණ කළ, ගෙවීම් පැහැර හැර ඇති සිසුන් මෙම ලිස්ට් එකේ නැත!");
@@ -550,12 +589,10 @@ function showSection(sectionId) {
     document.querySelectorAll('.nav-section').forEach(section => {
         section.style.display = 'none';
     });
-    
     let activeSection = document.getElementById(sectionId);
     if (activeSection) {
         activeSection.style.display = 'block';
     }
-    
     const navButtons = document.querySelectorAll('.navbar button');
     navButtons.forEach(btn => {
         if (btn.getAttribute('onclick').includes(sectionId)) {
