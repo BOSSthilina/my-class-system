@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Manager Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
     
     <div id="loginBox" class="card">
         <h2>Admin Login</h2>
@@ -18,12 +18,27 @@
 
     <div id="mainContent" style="display:none;">
         
-        <div class="navbar" style="display: flex; justify-content: space-around; background: #2c3e50; padding: 12px; border-radius: 8px; margin-bottom: 20px; flex-wrap: wrap; gap: 5px;">
-            <button onclick="showSection('addStudentSection')" style="background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">➕ Add Student</button>
-            <button onclick="showSection('summarySection')" style="background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">📊 Dashboard & Bulk</button>
-            <button onclick="showSection('pendingSection')" style="background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">⚠️ Pending</button>
-            <button onclick="showSection('studentListSection')" style="background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">👥 Student List</button>
-        </div>
+        <header class="main-header" style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div class="header-left">
+                <a href="#" style="text-decoration: none; display: flex; flex-direction: column;">
+                    <span style="font-size: 20px; font-weight: 700; color: #111827; letter-spacing: -0.5px;">CLASS<span style="color: #2563eb;">MANAGER</span></span>
+                    <small style="font-size: 9px; color: #6b7280; font-weight: 600; letter-spacing: 0.5px; margin-top: -2px;">PRO VERSION</small>
+                </a>
+            </div>
+
+            <nav class="header-center">
+                <div class="navbar" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="showSection('addStudentSection')" style="background: none; color: #374151; border: none; padding: 8px 12px; cursor: pointer; font-weight: 600; font-size: 14px;">➕ Add Student</button>
+                    <button onclick="showSection('summarySection')" style="background: none; color: #374151; border: none; padding: 8px 12px; cursor: pointer; font-weight: 600; font-size: 14px;">📊 Dashboard</button>
+                    <button onclick="showSection('pendingSection')" style="background: none; color: #374151; border: none; padding: 8px 12px; cursor: pointer; font-weight: 600; font-size: 14px;">⚠️ Pending</button>
+                    <button onclick="showSection('studentListSection')" style="background: none; color: #374151; border: none; padding: 8px 12px; cursor: pointer; font-weight: 600; font-size: 14px;">👥 Student List</button>
+                </div>
+            </nav>
+
+            <div class="header-right">
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()" style="background: #f3f4f6; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">🌙</button>
+            </div>
+        </header>
         
         <div class="card" style="margin-bottom: 20px;">
             <input type="text" id="searchBar" placeholder="🔍 Search Name..." onkeyup="renderStudents()">
@@ -130,8 +145,7 @@
                         <h4 id="totalStudentsCount" style="margin: 5px 0 0 0; color: #8e44ad;">0</h4>
                     </div>
                 </div>
-                <div id="gradeCounts" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; font-size: 11px; font-weight: bold; color: #555;">
-                    </div>
+                <div id="gradeCounts" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; font-size: 11px; font-weight: bold; color: #555;"></div>
             </div>
 
             <div class="card" style="text-align: center; border-top: 5px solid #25D366; margin-bottom: 20px;">
