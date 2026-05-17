@@ -38,10 +38,7 @@ function renderStudents() {
         return matchesSearch && matchesGrade && matchesGroup;
     });
 
-    // 2. රෑන්ක් එක හැදීම (මේක මුළු ශිෂ්‍ය ලැයිස්තුවෙන්ම හෝ filter කරපු අයගෙන් තීරණය කළ හැකියි)
-    let rankedStudents = [...students].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
-
-    // 3. දැන් ලිස්ට් එක පෙන්වනවා
+    // 2. දැන් ලිස්ට් එක පෙන්වනවා
     filteredList.forEach((s) => {
         let sIdx = students.indexOf(s);
         // 1. මේ ශිෂ්‍යයාගේ Grade එකේ අය විතරක් අරන් rank එක බලනවා
@@ -116,8 +113,6 @@ function saveMarks(sIdx, month) {
 // 3 Week Reminder මැසේජ් එක
 function send3WeekRemind(idx, month) {
     let s = students[idx];
-    
-    // මැසේජ් එකට මාසය එකතු කරලා තියෙන්නේ මෙතනින්
     let msg = `දෙමාපියන්ගේ අවධානය පිණිසයි,\n\n` +
               `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 3ක් පන්තියට පැමිණ ඇතත්, අදාළ මාසය සඳහා ගාස්තු ගෙවා ඇති බව පද්ධතියේ සටහන්ව නොමැත.\n\n` +
               `කරුණාකර ඒ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
@@ -130,7 +125,6 @@ function sendProgress(idx, month) {
     let s = students[idx];
     let score = s.marks?.[month] || 0;
 
-    // පන්තිය (Grade) අනුව Rank එක සහ Top 3 ලකුණු හොයනවා
     let sameGradeStudents = students.filter(st => st.grade === s.grade);
     let rankedInGrade = [...sameGradeStudents].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
     
@@ -139,7 +133,6 @@ function sendProgress(idx, month) {
     let second = rankedInGrade[1] ? (rankedInGrade[1].marks?.[month] || 0) : "0";
     let third = rankedInGrade[2] ? (rankedInGrade[2].marks?.[month] || 0) : "0";
 
-    // WhatsApp Message Format
     let msg = `Student: *${s.name}*\n` +
               `Grade: *${s.grade || 'N/A'}*\n` +
               `--------------------------\n` +
@@ -154,26 +147,24 @@ function sendProgress(idx, month) {
 
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
-// ⚠️ පරණ updatePendingList එක වෙනුවට මේක විතරක් දාන්න
+
+// Pending List එක යාවත්කාලීන කිරීම
 function updatePendingList() {
     let month = document.getElementById("monthSelect").value;
-    let selectedGroup = document.getElementById("groupFilter").value; // දැනට තෝරලා තියෙන පන්තිය
+    let selectedGroup = document.getElementById("groupFilter").value;
     let display = document.getElementById("pendingDisplay");
     display.innerHTML = "";
 
-    // 1. Filter එක "All" නම් ඔක්කොම පන්ති ගන්නවා, නැත්නම් තෝරපු පන්තිය විතරක් ගන්නවා
     let groupsToShow = (selectedGroup === "All") 
         ? [...new Set(students.map(s => s.group))] 
         : [selectedGroup];
 
     groupsToShow.forEach(groupName => {
-        // අදාළ පන්තියේ සල්ලි ගෙවපු නැති අයව විතරක් පෙරා ගන්නවා
         let unpaid = students.filter(s => s.group === groupName && (!s.fees || s.fees[month] !== "Paid"));
 
         if (unpaid.length > 0) {
             let namesList = unpaid.map((s, i) => `${i+1}. ${s.name}`).join("\n");
             
-            // WhatsApp එකට යවන මැසේජ් එක
             let waMsg = `*⚠️ PENDING PAYMENTS - ${groupName}*\n` +
                         `*Month:* ${month}\n` +
                         `--------------------------\n` +
@@ -195,23 +186,21 @@ function updatePendingList() {
         }
     });
 
-    // කිසිම කෙනෙක් නැත්නම්
     if (display.innerHTML === "") {
         display.innerHTML = "<p style='font-size:12px; color:gray; text-align:center; padding:10px;'>මෙම පන්තියේ සියලුම දෙනා ගෙවීම් කර ඇත. ✅</p>";
     }
 }
-// අනිත් සාමාන්‍ය Functions (Edit, Delete, TogglePaid, Mark)
+
+// Paid/Unpaid මාරු කිරීම සහ Receipt එක හැදීම
 async function togglePaid(idx, month) {
     let s = students[idx];
     if (!s.fees) s.fees = {};
     
-    // 1. Status එක මාරු කරනවා
     if (s.fees[month] === "Paid") {
         s.fees[month] = "Unpaid";
     } else {
         s.fees[month] = "Paid";
         
-        // 2. ගෙවපු වෙලාවට විතරක් ලස්සන WhatsApp Receipt එකක් හදනවා
         let date = new Date().toLocaleDateString('en-GB'); 
         let receiptNo = "RCPT-" + Date.now().toString().slice(-6); 
         
@@ -233,8 +222,8 @@ async function togglePaid(idx, month) {
         window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    await saveData(); // Data save කරනවා
-    renderStudents(); // Screen එක refresh කරනවා
+    await saveData();
+    renderStudents();
 }
 
 function mark(sIdx, month, wIdx) {
@@ -250,16 +239,17 @@ function copyToClipboard(encodedMsg) {
 function editStudent(idx) {
     let s = students[idx];
     document.getElementById("studentName").value = s.name;
-    document.getElementById("studentDOB").value = s.dob || ""; // උපන්දිනය
+    document.getElementById("studentDOB").value = s.dob || ""; 
     document.getElementById("parentPhone").value = s.phone;
-    document.getElementById("studentGrade").value = s.grade || ""; // ශ්‍රේණිය
+    document.getElementById("studentGrade").value = s.grade || ""; 
     document.getElementById("group").value = s.group;
     document.getElementById("monthlyFee").value = s.fee;
     document.getElementById("editIdx").value = idx;
     
-    document.getElementById("formTitle").innerText = "📝 Edit Student"; // Title එක මාරු කරනවා
-    window.scrollTo(0,0); // Page එක උඩටම යනවා ලේසි වෙන්න
+    document.getElementById("formTitle").innerText = "📝 Edit Student"; 
+    window.scrollTo(0,0); 
 }
+
 function addOrUpdateStudent() {
     let name = document.getElementById("studentName").value;
     let dob = document.getElementById("studentDOB").value;
@@ -275,13 +265,19 @@ function addOrUpdateStudent() {
         // අලුත් ළමයෙක්
         students.push({ name, phone, grade, group, fee, dob, marks: {}, attendance: {}, fees: {} });
     } else {
-        // කලින් හිටපු ළමයෙක්ව Update කිරීම
+        // 👈 කලින් හිටපු ළමයෙක්ව Update කිරීමේදී පරණ Objects ආරක්ෂා කරගන්නවා
         students[editIdx].name = name;
         students[editIdx].dob = dob;
         students[editIdx].phone = phone;
         students[editIdx].grade = grade;
         students[editIdx].group = group;
         students[editIdx].fee = fee;
+        
+        // මේවා කලින් නොතිබුනොත් විතරක් හිස් Object එකක් දානවා
+        if(!students[editIdx].marks) students[editIdx].marks = {};
+        if(!students[editIdx].attendance) students[editIdx].attendance = {};
+        if(!students[editIdx].fees) students[editIdx].fees = {};
+
         document.getElementById("editIdx").value = "";
         document.getElementById("formTitle").innerText = "+ Add Student";
     }
@@ -290,14 +286,13 @@ function addOrUpdateStudent() {
     renderStudents();
     checkBirthdays();
     
-    // Input fields හිස් කරනවා
     document.getElementById("studentName").value = "";
     document.getElementById("studentDOB").value = "";
     document.getElementById("parentPhone").value = "";
     document.getElementById("monthlyFee").value = "";
 }
+
 function updateIncomeSummary(dataToShow) {
-    // dataToShow තිබුණොත් ඒක ගන්නවා, නැත්නම් ඔක්කොම ශිෂ්‍යයෝ (students) ගන්නවා
     let listToCalculate = dataToShow || students; 
     
     let month = document.getElementById("monthSelect").value;
@@ -309,29 +304,23 @@ function updateIncomeSummary(dataToShow) {
     let counts = {}; 
 
     listToCalculate.forEach(s => {
-        // 1. මුදල් ගණනය කිරීම
         let fee = parseFloat(s.fee) || 0;
         totalExpected += fee;
         if (s.fees && s.fees[month] === "Paid") {
             totalCollected += fee;
         }
 
-        // 2. Grade එක අනුව ළමයි ගණන් කිරීම
         let g = s.grade || "N/A";
         counts[g] = (counts[g] || 0) + 1;
     });
 
     let totalPending = totalExpected - totalCollected;
 
-    // HTML එකට දත්ත යැවීම
     document.getElementById("totalExpected").innerText = `Rs. ${totalExpected.toLocaleString()}`;
     document.getElementById("totalCollected").innerText = `Rs. ${totalCollected.toLocaleString()}`;
     document.getElementById("totalPending").innerText = `Rs. ${totalPending.toLocaleString()}`;
-    
-    // දැනට පෙන්වන (Filter වෙලා තියෙන) ළමයි ගණන
     document.getElementById("totalStudentsCount").innerText = listToCalculate.length;
 
-    // Grade අනුව විස්තරය
     let gradeHtml = Object.keys(counts)
         .sort()
         .map(g => `<span>${g}: ${counts[g]}</span>`)
@@ -348,38 +337,35 @@ function deleteStudent(idx) {
         renderStudents(); 
     }
 }
+
 function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
     const btn = document.querySelector(".dark-mode-toggle");
     
     if (document.body.classList.contains("dark-mode")) {
-        btn.innerText = "☀️"; // Dark mode එකේදී ඉර පෙන්වනවා
+        btn.innerText = "☀️"; 
         localStorage.setItem("theme", "dark");
     } else {
-        btn.innerText = "🌙"; // Light mode එකේදී හඳ පෙන්වනවා
+        btn.innerText = "🌙"; 
         localStorage.setItem("theme", "light");
     }
 }
 
-// පේජ් එක මුලින්ම ලෝඩ් වෙනකොට කලින් දාපු Settings බලනවා
 window.onload = function() {
-    // 1. කලින් සේව් කරපු තීම් එක (Dark/Light) බලලා ඇප්ලයි කරනවා
     if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark-mode");
-        document.querySelector(".dark-mode-toggle").innerText = "☀️";
+        let toggleBtn = document.querySelector(".dark-mode-toggle");
+        if(toggleBtn) toggleBtn.innerText = "☀️";
     }
-
-    // 2. දත්ත ලෝඩ් කරන එක මෙතනදී එක පාරක් කරනවා
-    // loadData() ඇතුළේ renderStudents() සහ checkBirthdays() තියෙන නිසා ඔක්කොම ලෝඩ් වෙනවා
     loadData(); 
 };
+
 async function sendBulkProgress() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
     let selectedGrade = document.getElementById("gradeFilter").value;
     let selectedGroup = document.getElementById("groupFilter").value;
 
-    // දැනට පේන්න ඉන්න (Filter කරපු) ළමයි ටික විතරක් ගන්නවා
     let listToSend = students.filter(s => {
         let matchesSearch = (s.name || "").toLowerCase().includes(search);
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
@@ -388,7 +374,6 @@ async function sendBulkProgress() {
     });
 
     if (listToSend.length === 0) return alert("යවන්න ළමයි කවුරුත් නැහැ!");
-
     if (!confirm(`${listToSend.length} දෙනෙකුට මැසේජ් යවන්නද?`)) return;
 
     let statusDiv = document.getElementById("bulkStatus");
@@ -397,7 +382,6 @@ async function sendBulkProgress() {
         let s = listToSend[i];
         let score = s.marks?.[month] || 0;
 
-        // රෑන්ක් එක සහ Top 3 ගණනය කිරීම (Grade එක අනුව)
         let sameGradeStudents = students.filter(st => st.grade === s.grade);
         let rankedInGrade = [...sameGradeStudents].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
         let rank = rankedInGrade.findIndex(rs => rs.name === s.name) + 1;
@@ -418,23 +402,18 @@ async function sendBulkProgress() {
                   `Thank you!`;
 
         statusDiv.innerText = `Sending to ${s.name} (${i + 1}/${listToSend.length})...`;
-
-        // WhatsApp Web window එක open කරනවා
         window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-
-        // පද්ධතිය ටිකක් වෙලා නතර කරනවා (Delay එකක් දානවා WhatsApp එකට ලේසි වෙන්න)
         await new Promise(resolve => setTimeout(resolve, 10000)); 
     }
-
     statusDiv.innerText = "✅ සියලුම මැසේජ් යවා අවසන්!";
 }
+
 async function sendBulk3WeekReminders() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
     let selectedGrade = document.getElementById("gradeFilter").value;
     let selectedGroup = document.getElementById("groupFilter").value;
 
-    // 1. දැනට Filter කරලා ඉන්න ලිස්ට් එක මුලින් ගන්නවා
     let listToFilter = students.filter(s => {
         let matchesSearch = (s.name || "").toLowerCase().includes(search);
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
@@ -442,7 +421,6 @@ async function sendBulk3WeekReminders() {
         return matchesSearch && matchesGrade && matchesGroup;
     });
 
-    // 2. ඒ අයගෙන් "සති 3ක් පැමිණි" සහ "සල්ලි නොගෙවූ" අයව විතරක් වෙන් කරගන්නවා
     let listToSend = listToFilter.filter(s => {
         let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
         let isUnpaid = (s.fees?.[month] !== "Paid");
@@ -450,7 +428,6 @@ async function sendBulk3WeekReminders() {
     });
 
     if (listToSend.length === 0) return alert("සති 3ක් සම්පූර්ණ කළ, ගෙවීම් පැහැර හැර ඇති සිසුන් මෙම ලිස්ට් එකේ නැත!");
-
     if (!confirm(`${listToSend.length} දෙනෙකුට Reminder මැසේජ් යවන්නද?`)) return;
 
     let statusDiv = document.getElementById("bulkStatus");
@@ -463,21 +440,16 @@ async function sendBulk3WeekReminders() {
                   `කරුණාකර ඒ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
 
         statusDiv.innerText = `Sending Reminder to ${s.name} (${i + 1}/${listToSend.length})...`;
-
         window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-
-        // WhatsApp එකට පහසු වෙන්න තත්පර 10ක Delay එකක්
         await new Promise(resolve => setTimeout(resolve, 10000));
     }
-
     statusDiv.innerText = "✅ සියලුම Reminders යවා අවසන්!";
 }
+
 function exportToExcel() {
-    // Column names ටික මුලින් දාගන්නවා
     let csvContent = "data:text/csv;charset=utf-8,\uFEFFName,Phone,Grade,Group,Monthly Fee\n";
     
     students.forEach(s => {
-        // ඔයා ලියපු ලයින් එක මෙතනට එන්නේ:
         csvContent += `"${s.name}","${s.phone}","${s.grade}","${s.group}","${s.fee}"\n`;
     });
 
@@ -488,10 +460,9 @@ function exportToExcel() {
     document.body.appendChild(link);
     link.click();
 }
-// 1. කලින් තිබුණ checkBirthdays එක වෙනුවට මේක දාන්න
+
 function checkBirthdays() {
     let today = new Date();
-    // MM-DD format එක (උදා: 04-07)
     let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
     
     let alertDiv = document.getElementById("birthdayAlert");
@@ -513,7 +484,6 @@ function checkBirthdays() {
     }
 }
 
-// 2. මේක අලුතින්ම යටින් ඇඩ් කරන්න (Wishes යවන කොටස)
 async function sendBulkBirthdays() {
     let today = new Date();
     let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
@@ -524,17 +494,14 @@ async function sendBulkBirthdays() {
     for (let i = 0; i < birthdaysToday.length; i++) {
         let s = birthdaysToday[i];
         
-        // මෙතන ඔයාට ඕන විදිහට මැසේජ් එක වෙනස් කරගන්න පුළුවන්
         let msg = `\u{1F31F} *HAPPY BIRTHDAY!* \u{1F31F}\n\n` +
-          `ආදරණීය *${s.name}*,\n` +
-          `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! \u{1F382}\u{2728}\n\n` +
-          `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
-          `මීට,\n*Thilina Sir*`;
+                  `ආදරණීය *${s.name}*,\n` +
+                  `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! \u{1F382}\u{2728}\n\n` +
+                  `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
+                  `මීට,\n*Thilina Sir*`;
 
-        // WhatsApp Window එක Open කරනවා
         window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 
-        // එක ළමයෙක්ට වඩා ඉන්නවා නම් තත්පර 5ක විවේකයක් දෙනවා
         if (birthdaysToday.length > 1) {
             await new Promise(r => setTimeout(r, 5000));
         }
@@ -544,8 +511,6 @@ async function sendBulkBirthdays() {
 
 function send4WeekRemind(idx, month) {
     let s = students[idx];
-    
-    // මේ මැසේජ් එකේ සති 4ක් ආපු බව සහ ගෙවීම් ගැන අවධාරණය කරලා තියෙනවා
     let msg = `*දෙමාපියන්ගේ විශේෂ අවධානය පිණිසයි,* \n\n` +
               `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 4ක්ම පන්තියට සහභාගී වී ඇත.\n\n` +
               `නමුත් පද්ධතියට අනුව එම මාසය සඳහා වන ගාස්තු තවමත් ගෙවා ඇති බව සටහන් වී නොමැත. කරුණාකර අද දින මේ පිළිබඳව සොයා බලා කටයුතු කරන ලෙස කාරුණිකව දන්වා සිටිමු. \n\n` +
@@ -557,7 +522,6 @@ function send4WeekRemind(idx, month) {
 async function sendBulk4WeekReminders() {
     let month = document.getElementById("monthSelect").value;
     
-    // සති 4ක් ආපු, හැබැයි සල්ලි නොගෙවපු (Paid නැති) අයව විතරක් තෝරාගන්නවා
     let listToSend = students.filter(s => {
         let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
         let isUnpaid = (s.fees?.[month] !== "Paid");
@@ -565,7 +529,6 @@ async function sendBulk4WeekReminders() {
     });
 
     if (listToSend.length === 0) return alert("සති 4ම සම්පූර්ණ කළ, ගෙවීම් පැහැර හැර ඇති සිසුන් මෙම ලිස්ට් එකේ නැත!");
-
     if (!confirm(`${listToSend.length} දෙනෙකුට 4-Week Alert එක යවන්නද?`)) return;
 
     let statusDiv = document.getElementById("bulkStatus");
@@ -577,28 +540,22 @@ async function sendBulk4WeekReminders() {
                   `ඔබගේ දරුවා ${month} මාසයේ සති 4ක්ම පන්තියට පැමිණ ඇතත්, ගාස්තු ගෙවා ඇති බව සටහන්ව නැත. කරුණාකර මේ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
 
         statusDiv.innerText = `Sending to ${s.name} (${i + 1}/${listToSend.length})...`;
-        
         window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-        
-        // WhatsApp Block නොවෙන්න තත්පර 10ක විවේකයක් දෙනවා
         await new Promise(resolve => setTimeout(resolve, 10000));
     }
     statusDiv.innerText = "✅ සියලුම 4-Week Alerts යවා අවසන්!";
 }
+
 function showSection(sectionId) {
-    // හැම section එකක්ම මුලින් හංගනවා
     document.querySelectorAll('.nav-section').forEach(section => {
         section.style.display = 'none';
     });
     
-    // සර් තෝරපු section එක විතරක් මතු කරනවා
     let activeSection = document.getElementById(sectionId);
     if (activeSection) {
-        // summarySection සහ studentListSection සාමාන්‍ය div නිසා block දානවා, අනිත් ඒවා card නිසා display එක card කරනවා
-        activeSection.style.display = (sectionId === 'summarySection' || sectionId === 'studentListSection') ? 'block' : 'block';
+        activeSection.style.display = 'block';
     }
     
-    // ක්ලික් කරපු බටන් එක නිල් පාට කරලා, අනිත් ඒවා තද අළු පාට කරනවා
     const navButtons = document.querySelectorAll('.navbar button');
     navButtons.forEach(btn => {
         if (btn.getAttribute('onclick').includes(sectionId)) {
@@ -608,8 +565,3 @@ function showSection(sectionId) {
         }
     });
 }
-
-
-
-
-
