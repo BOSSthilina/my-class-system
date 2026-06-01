@@ -125,7 +125,7 @@ function saveMarks(sIdx, month) {
 function send3WeekRemind(idx, month) {
     let s = students[idx];
     let msg = `දෙමාපියන්ගේ අවධානය පිණිසයි,\n\n` +
-              `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 3ක් පන්තියට පැමිණ ඇතත්, අදාළ මාසය සඳහා ගාස්තු ගෙවා ඇති බව පද්ධතියේ සටහන්ව නොමැත.\n\n` +
+              `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසය (ගිය මාසය) සඳහා පන්ති ගාස්තු ගෙවා ඇති බව පද්ධතියේ සටහන්ව නොමැත.\n\n` +
               `කරුණාකර ඒ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
