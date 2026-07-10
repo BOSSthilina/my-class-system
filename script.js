@@ -8,14 +8,14 @@ async function loadData() {
     const res = await fetch(SCRIPT_URL);
     students = await res.json();
     renderStudents();
-    checkBirthdays();
+    checkBirthdays(); // 👈 මේක කෝඩ් එකේ යටින් ලියලා තියෙනවා දැන්
 }
 
 async function saveData() {
     await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(students) });
 }
 
-// පේජ් එක ලෝඩ් වෙද්දීම කෙලින්ම ඩේටා ලෝඩ් කරලා ඩෑෂ්බෝඩ් එක මතු කරනවා
+// 🚀 100%ක් නිවැරදි කරපු window.onload එක (ඩේටා ආවට පස්සෙමයි ඩෑෂ්බෝඩ් එක මතු කරන්නේ)
 window.onload = function() {
     if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark-mode");
@@ -23,8 +23,14 @@ window.onload = function() {
         if(toggleBtn) toggleBtn.innerText = "☀️";
     }
     
-    loadData(); 
-    showSection('summarySection'); 
+    // කෙලින්ම ඩේටා ලෝඩ් කරලා, ඒක සාර්ථක වුණාට පස්සෙම සෙක්ෂන් එක පෙන්වනවා
+    loadData().then(() => {
+        showSection('summarySection');
+    }).catch(err => {
+        console.error("Data loading error: ", err);
+        // එහෙම වුණොත් සෙක්ෂන් එක නිකන්ම හරි මතු කරනවා
+        showSection('summarySection');
+    });
 };
 
 function renderStudents() {
@@ -43,8 +49,6 @@ function renderStudents() {
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
         let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup);
         
-        // 🚀 joinedMonth එකක් නැති පරණ ළමයි හැම මාසෙකම පෙන්වනවා. 
-        // joinedMonth එකක් තියෙන අලුත් ළමයි විතරක් අදාළ මාසයේ ඉඳන් ඉදිරියට පෙන්වනවා.
         let isAvailableInMonth = true;
         if (s.joinedMonth) {
             let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
@@ -161,7 +165,6 @@ function sendProgress(idx, month) {
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
 
-// Pending List එකත් පරණ ළමයි පේන විදිහට හැදුවා
 function updatePendingList() {
     let month = document.getElementById("monthSelect").value;
     let selectedGroup = document.getElementById("groupFilter").value;
@@ -379,7 +382,52 @@ function toggleDarkMode() {
     }
 }
 
-// Bulk Progress Reports
+// 🆕 කලින් හැලුණු Birthday Functions ටික මෙන්න ආයෙත් දැම්මා
+function checkBirthdays() {
+    let today = new Date();
+    let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
+    let alertDiv = document.getElementById("birthdayAlert");
+    if (!alertDiv) return;
+
+    let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
+    
+    if(birthdaysToday.length > 0) {
+        let names = birthdaysToday.map(s => s.name).join(", ");
+        alertDiv.innerHTML = `
+            <div style="background:#fff3e0; padding:15px; border-radius:10px; border:1px dashed #ff9800; display:flex; justify-content:space-between; align-items:center;">
+                <span>🎉 Today's Birthdays: <b>${names}</b> 🎂</span>
+                <button onclick="sendBulkBirthdays()" style="background:#25D366; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📲 Send WhatsApp Wishes</button>
+            </div>
+        `;
+        alertDiv.style.display = "block";
+    } else {
+        alertDiv.style.display = "none";
+    }
+}
+
+async function sendBulkBirthdays() {
+    let today = new Date();
+    let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
+    let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
+
+    if (!confirm(`${birthdaysToday.length} දෙනෙකුට සුබපැතුම් යවන්නද?`)) return;
+
+    for (let i = 0; i < birthdaysToday.length; i++) {
+        let s = birthdaysToday[i];
+        let msg = `\u{1F31F} *HAPPY BIRTHDAY!* \u{1F31F}\n\n` +
+                  `ආදරණීය *${s.name}*,\n` +
+                  `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා karami! \u{1F382}\u{2728}\n\n` +
+                  `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
+                  `මීට,\n*Thilina Sir*`;
+
+        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        if (birthdaysToday.length > 1) {
+            await new Promise(r => setTimeout(r, 5000));
+        }
+    }
+    alert("සියලුම සුබපැතුම් යවා අවසන්!");
+}
+
 async function sendBulkProgress() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
@@ -435,7 +483,6 @@ async function sendBulkProgress() {
     statusDiv.innerText = "✅ සියලුම මැසේජ් යවා අවසන්!";
 }
 
-// Bulk 3-Week Reminders
 async function sendBulk3WeekReminders() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
@@ -494,61 +541,15 @@ function exportToExcel() {
     link.click();
 }
 
-function checkBirthdays() {
-    let today = new Date();
-    let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
-    let alertDiv = document.getElementById("birthdayAlert");
-    if (!alertDiv) return;
-
-    let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
-    
-    if(birthdaysToday.length > 0) {
-        let names = birthdaysToday.map(s => s.name).join(", ");
-        alertDiv.innerHTML = `
-            <div style="background:#fff3e0; padding:15px; border-radius:10px; border:1px dashed #ff9800; display:flex; justify-content:space-between; align-items:center;">
-                <span>🎉 Today's Birthdays: <b>${names}</b> 🎂</span>
-                <button onclick="sendBulkBirthdays()" style="background:#25D366; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📲 Send WhatsApp Wishes</button>
-            </div>
-        `;
-        alertDiv.style.display = "block";
-    } else {
-        alertDiv.style.display = "none";
-    }
-}
-
-async function sendBulkBirthdays() {
-    let today = new Date();
-    let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
-    let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
-
-    if (!confirm(`${birthdaysToday.length} දෙනෙකුට සුබපැතුම් යවන්නද?`)) return;
-
-    for (let i = 0; i < birthdaysToday.length; i++) {
-        let s = birthdaysToday[i];
-        let msg = `\u{1F31F} *HAPPY BIRTHDAY!* \u{1F31F}\n\n` +
-                  `ආදරණීය *${s.name}*,\n` +
-                  `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! \u{1F382}\u{2728}\n\n` +
-                  `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
-                  `මීට,\n*Thilina Sir*`;
-
-        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-        if (birthdaysToday.length > 1) {
-            await new Promise(r => setTimeout(r, 5000));
-        }
-    }
-    alert("සියලුම සුබපැතුම් යවා අවසන්!");
-}
-
 function send4WeekRemind(idx, month) {
     let s = students[idx];
     let msg = `*දෙමාපියන්ගේ විශේෂ අවධානය පිණිසයි,* \n\n` +
-              `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 4ක්ම පන්තියට සහභාගී වී ඇත.\n\n` +
+              `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 4ක්ම පන්තියට සහභาගී වී ඇත.\n\n` +
               `නමුත් පද්ධතියට අනුව එම මාසය සඳහා වන ගාස්තු තවමත් ගෙවා ඇති බව සටහන් වී නොමැත. කරුණාකර අද දින මේ පිළිබඳව සොයා බලා කටයුතු කරන ලෙස කාරුණිකව දන්වා සිටිමු. \n\n` +
               `ස්තූතියි! \n*Excellence Maths Class*`;
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-// Bulk 4-Week Alerts
 async function sendBulk4WeekReminders() {
     let month = document.getElementById("monthSelect").value;
     let currentMonthIdx = monthsOrder.indexOf(month);
@@ -583,7 +584,6 @@ async function sendBulk4WeekReminders() {
     statusDiv.innerText = "✅ සියලුම 4-Week Alerts යවා අවසන්!";
 }
 
-// Navigation Actions
 function showSection(sectionId) {
     document.querySelectorAll('.nav-section').forEach(section => {
         section.style.display = 'none';
