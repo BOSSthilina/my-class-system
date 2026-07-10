@@ -15,7 +15,7 @@ async function saveData() {
     await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(students) });
 }
 
-// 🚀 පේජ් එක ලෝඩ් වෙද්දීම කෙලින්ම ඩේටා ලෝඩ් කරලා ඩෑෂ්බෝඩ් එක මතු කරනවා
+// පේජ් එක ලෝඩ් වෙද්දීම කෙලින්ම ඩේටා ලෝඩ් කරලා ඩෑෂ්බෝඩ් එක මතු කරනවා
 window.onload = function() {
     if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark-mode");
@@ -23,7 +23,6 @@ window.onload = function() {
         if(toggleBtn) toggleBtn.innerText = "☀️";
     }
     
-    // ලොගින් එකක් නැතුව කෙලින්ම රන් වෙන කොටස
     loadData(); 
     showSection('summarySection'); 
 };
@@ -44,7 +43,8 @@ function renderStudents() {
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
         let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup);
         
-        // 🚀 ළමයා එකතු වුණු මාසය බලනවා
+        // 🚀 joinedMonth එකක් නැති පරණ ළමයි හැම මාසෙකම පෙන්වනවා. 
+        // joinedMonth එකක් තියෙන අලුත් ළමයි විතරක් අදාළ මාසයේ ඉඳන් ඉදිරියට පෙන්වනවා.
         let isAvailableInMonth = true;
         if (s.joinedMonth) {
             let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
@@ -161,6 +161,7 @@ function sendProgress(idx, month) {
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`);
 }
 
+// Pending List එකත් පරණ ළමයි පේන විදිහට හැදුවා
 function updatePendingList() {
     let month = document.getElementById("monthSelect").value;
     let selectedGroup = document.getElementById("groupFilter").value;
@@ -378,6 +379,7 @@ function toggleDarkMode() {
     }
 }
 
+// Bulk Progress Reports
 async function sendBulkProgress() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
@@ -433,6 +435,7 @@ async function sendBulkProgress() {
     statusDiv.innerText = "✅ සියලුම මැසේජ් යවා අවසන්!";
 }
 
+// Bulk 3-Week Reminders
 async function sendBulk3WeekReminders() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
@@ -545,6 +548,7 @@ function send4WeekRemind(idx, month) {
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
+// Bulk 4-Week Alerts
 async function sendBulk4WeekReminders() {
     let month = document.getElementById("monthSelect").value;
     let currentMonthIdx = monthsOrder.indexOf(month);
@@ -579,6 +583,7 @@ async function sendBulk4WeekReminders() {
     statusDiv.innerText = "✅ සියලුම 4-Week Alerts යවා අවසන්!";
 }
 
+// Navigation Actions
 function showSection(sectionId) {
     document.querySelectorAll('.nav-section').forEach(section => {
         section.style.display = 'none';
