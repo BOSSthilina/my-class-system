@@ -1,7 +1,7 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIpplQGzEDNYZRjfA5A0cb-khoYf4yYLfQUkhD4qtQ3EUKFVxtnTv4cH5M7TPTdHM6/exec";
 let students = [];
 
-// මාස වල අනුපිළිවෙල (Global එකක් විදිහට හැම තැනටම පාවිච්චි කරන්න උඩින්ම දැම්මා)
+// මාස වල අනුපිළිවෙල
 const monthsOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 async function loadData() {
@@ -15,14 +15,18 @@ async function saveData() {
     await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(students) });
 }
 
-function login() {
-    if(document.getElementById("username").value === "admin" && document.getElementById("password").value === "123") {
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("mainContent").style.display = "block";
-        loadData();
-        showSection('summarySection');
+// 🚀 පේජ් එක ලෝඩ් වෙද්දීම කෙලින්ම ඩේටා ලෝඩ් කරලා ඩෑෂ්බෝඩ් එක මතු කරනවා
+window.onload = function() {
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-mode");
+        let toggleBtn = document.querySelector(".dark-mode-toggle");
+        if(toggleBtn) toggleBtn.innerText = "☀️";
     }
-}
+    
+    // ලොගින් එකක් නැතුව කෙලින්ම රන් වෙන කොටස
+    loadData(); 
+    showSection('summarySection'); 
+};
 
 function renderStudents() {
     let list = document.getElementById("studentList");
@@ -374,16 +378,6 @@ function toggleDarkMode() {
     }
 }
 
-window.onload = function() {
-    if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark-mode");
-        let toggleBtn = document.querySelector(".dark-mode-toggle");
-        if(toggleBtn) toggleBtn.innerText = "☀️";
-    }
-    loadData(); 
-};
-
-// 🆕 Bulk functions වලටත් joinedMonth Filter එක දැම්මා
 async function sendBulkProgress() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
