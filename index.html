@@ -4,20 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Manager Pro</title>
+    <!-- Icons සඳහා Font Awesome ඇඩ් කළා -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
-    <div id="loginBox" class="card">
-        <h2>Admin Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-    </div>
 
-    <div id="mainContent" style="display:none;">
+    <!-- 🚀 id="mainContent" එක display:block කළා (දැන් කෙලින්ම සිස්ටම් එක පේනවා) -->
+    <div id="mainContent" style="display:block;">
         
+        <!-- SimplyTek Style Modern Navigation Bar -->
         <header class="main-header" style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
             <div class="header-left">
                 <a href="#" style="text-decoration: none; display: flex; flex-direction: column;">
@@ -40,6 +36,7 @@
             </div>
         </header>
         
+        <!-- Global Filters (සෙවුම් කොටස) -->
         <div class="card" style="margin-bottom: 20px;">
             <input type="text" id="searchBar" placeholder="🔍 Search Name..." onkeyup="renderStudents()">
             <div style="display: flex; gap: 10px; margin-top: 10px;">
@@ -87,6 +84,7 @@
 
         <div id="birthdayAlert" style="margin-bottom: 20px; display: none;"></div>
 
+        <!-- Add / Edit Student Section -->
         <div class="card nav-section" id="addStudentSection">
             <h3 id="formTitle">+ Add New Student</h3>
             <input type="hidden" id="editIdx">
@@ -124,6 +122,7 @@
             <button onclick="addOrUpdateStudent()" style="background: #27ae60;">Save Student</button>
         </div>
 
+        <!-- Dashboard Section -->
         <div class="nav-section" id="summarySection">
             <div class="card" id="incomeSummary" style="background: #f8f9fa; border-left: 8px solid #2980b9; margin-bottom: 20px; color: black;">
                 <h3>📊 Class Summary (<span id="summaryMonth">May</span>)</h3>
@@ -172,11 +171,13 @@
             </div>
         </div>
 
+        <!-- Pending Section -->
         <div class="card nav-section" id="pendingSection" style="border: 2px solid #e74c3c;">
             <h3 style="color: #e74c3c; margin-top: 0;">⚠️ Pending Payments (ගාස්තු ගෙවීමට ඇති අය)</h3>
             <div id="pendingDisplay"></div>
         </div>
 
+        <!-- Student List Section -->
         <div class="nav-section" id="studentListSection">
             <div id="studentList"></div>
         </div>
