@@ -183,6 +183,27 @@
 
     </div>
 
+    <!-- 🚀 මෙන්න මෙතනට තමයි Bulk WhatsApp Sending Modal Popup එක එකතු කළේ -->
+    <div id="bulkModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; padding:25px; border-radius:12px; width:90%; max-width:400px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.3); color:#333;">
+            <h3 id="bulkModalTitle" style="margin-top:0; color:#25D366;">📲 Send WhatsApp Messages</h3>
+            <p id="bulkModalStatus" style="font-size:14px; color:#555; margin:15px 0;">Preparing messages...</p>
+            
+            <div style="background:#eee; border-radius:10px; height:10px; width:100%; margin-bottom:20px; overflow:hidden;">
+                <div id="bulkProgressBar" style="background:#25D366; width:0%; height:100%; transition:width 0.3s;"></div>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <button id="bulkSendBtn" onclick="sendNextBulkMessage()" style="background:#25D366; color:white; font-weight:bold; padding:12px; border:none; border-radius:8px; flex:2; cursor:pointer;">
+                    🚀 Send Next Message
+                </button>
+                <button onclick="closeBulkModal()" style="background:#e74c3c; color:white; font-weight:bold; padding:12px; border:none; border-radius:8px; flex:1; cursor:pointer;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
