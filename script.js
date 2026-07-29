@@ -4,18 +4,21 @@ let students = [];
 // මාස වල අනුපිළිවෙල
 const monthsOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+// 🚀 Bulk Messaging Queue Variables
+let bulkQueue = [];
+let bulkCurrentIndex = 0;
+
 async function loadData() {
     const res = await fetch(SCRIPT_URL);
     students = await res.json();
     renderStudents();
-    checkBirthdays(); // 👈 මේක කෝඩ් එකේ යටින් ලියලා තියෙනවා දැන්
+    checkBirthdays();
 }
 
 async function saveData() {
     await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(students) });
 }
 
-// 🚀 100%ක් නිවැරදි කරපු window.onload එක (ඩේටා ආවට පස්සෙමයි ඩෑෂ්බෝඩ් එක මතු කරන්නේ)
 window.onload = function() {
     if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark-mode");
@@ -23,12 +26,10 @@ window.onload = function() {
         if(toggleBtn) toggleBtn.innerText = "☀️";
     }
     
-    // කෙලින්ම ඩේටා ලෝඩ් කරලා, ඒක සාර්ථක වුණාට පස්සෙම සෙක්ෂන් එක පෙන්වනවා
     loadData().then(() => {
         showSection('summarySection');
     }).catch(err => {
         console.error("Data loading error: ", err);
-        // එහෙම වුණොත් සෙක්ෂන් එක නිකන්ම හරි මතු කරනවා
         showSection('summarySection');
     });
 };
@@ -43,11 +44,11 @@ function renderStudents() {
 
     let currentMonthIdx = monthsOrder.indexOf(month);
 
-    // 1. Filter කිරීම
     let filteredList = students.filter(s => {
         let matchesSearch = (s.name || "").toLowerCase().includes(search);
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
-        let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup);
+        let studentGroup = s.group || s.class || s.classGroup || "";
+        let matchesGroup = (selectedGroup === "All") || (studentGroup === selectedGroup);
         
         let isAvailableInMonth = true;
         if (s.joinedMonth) {
@@ -60,7 +61,6 @@ function renderStudents() {
         return matchesSearch && matchesGrade && matchesGroup && isAvailableInMonth;
     });
     
-    // 2. දැන් ලිස්ට් එක පෙන්වනවා
     filteredList.forEach((s) => {
         let sIdx = students.indexOf(s);
         let sameGradeStudents = students.filter(st => st.grade === s.grade);
@@ -179,7 +179,8 @@ function updatePendingList() {
 
     groupsToShow.forEach(groupName => {
         let unpaid = students.filter(s => {
-            let matchesGroup = s.group === groupName;
+            let studentGroup = s.group || s.class || s.classGroup || "";
+            let matchesGroup = studentGroup === groupName;
             let isUnpaid = (!s.fees || s.fees[month] !== "Paid");
             
             let isAvailableInMonth = true;
@@ -382,7 +383,6 @@ function toggleDarkMode() {
     }
 }
 
-// 🆕 කලින් හැලුණු Birthday Functions ටික මෙන්න ආයෙත් දැම්මා
 function checkBirthdays() {
     let today = new Date();
     let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
@@ -414,9 +414,9 @@ async function sendBulkBirthdays() {
 
     for (let i = 0; i < birthdaysToday.length; i++) {
         let s = birthdaysToday[i];
-        let msg = `\u{1F31F} *HAPPY BIRTHDAY!* \u{1F31F}\n\n` +
+        let msg = `🌟 *HAPPY BIRTHDAY!* 🌟\n\n` +
                   `ආදරණීය *${s.name}*,\n` +
-                  `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා karami! \u{1F382}\u{2728}\n\n` +
+                  `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! 🎂✨\n\n` +
                   `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
                   `මීට,\n*Thilina Sir*`;
 
@@ -428,17 +428,81 @@ async function sendBulkBirthdays() {
     alert("සියලුම සුබපැතුම් යවා අවසන්!");
 }
 
-async function sendBulkProgress() {
+function send4WeekRemind(idx, month) {
+    let s = students[idx];
+    let msg = `*දෙමාපියන්ගේ විශේෂ අවධානය පිණිසයි,* \n\n` +
+              `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 4ක්ම පන්තියට සහභාගී වී ඇත.\n\n` +
+              `නමුත් පද්ධතියට අනුව එම මාසය සඳහා වන ගාස්තු තවමත් ගෙවා ඇති බව සටහන් වී නොමැත. කරුණාකර අද දින මේ පිළිබඳව සොයා බලා කටයුතු කරන ලෙස කාරුණිකව දන්වා සිටිමු. \n\n` +
+              `ස්තූතියි! \n*Excellence Maths Class*`;
+    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ========================================================
+// 🚀 100% WORKING BULK MESSAGING SYSTEM (QUEUE WITH MODAL)
+// ========================================================
+
+function startBulkQueue(list, title) {
+    if (list.length === 0) {
+        alert("ලිස්ට් එකේ යවන්න ළමයි කවුරුත් නැත!");
+        return;
+    }
+    bulkQueue = list;
+    bulkCurrentIndex = 0;
+    
+    document.getElementById("bulkModalTitle").innerText = title;
+    document.getElementById("bulkModal").style.display = "flex";
+    updateBulkModalUI();
+}
+
+function updateBulkModalUI() {
+    let total = bulkQueue.length;
+    let current = bulkCurrentIndex;
+    
+    if (current >= total) {
+        document.getElementById("bulkModalStatus").innerHTML = "<b>✅ සියලුම මැසේජ් යවා අවසන්!</b>";
+        document.getElementById("bulkProgressBar").style.width = "100%";
+        document.getElementById("bulkSendBtn").style.display = "none";
+        return;
+    }
+
+    let item = bulkQueue[current];
+    let percentage = Math.round((current / total) * 100);
+    
+    document.getElementById("bulkModalStatus").innerHTML = `<b>(${current + 1}/${total})</b> Sending to: <b>${item.student.name}</b>`;
+    document.getElementById("bulkProgressBar").style.width = percentage + "%";
+    document.getElementById("bulkSendBtn").style.display = "block";
+    document.getElementById("bulkSendBtn").innerText = `🚀 Send to ${item.student.name}`;
+}
+
+function sendNextBulkMessage() {
+    if (bulkCurrentIndex < bulkQueue.length) {
+        let item = bulkQueue[bulkCurrentIndex];
+        window.open(`https://wa.me/${item.student.phone}?text=${encodeURIComponent(item.message)}`, '_blank');
+        
+        bulkCurrentIndex++;
+        updateBulkModalUI();
+    }
+}
+
+function closeBulkModal() {
+    document.getElementById("bulkModal").style.display = "none";
+    bulkQueue = [];
+    bulkCurrentIndex = 0;
+}
+
+// Bulk Action Buttons (Updated)
+function sendBulkProgress() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
     let selectedGrade = document.getElementById("gradeFilter").value;
     let selectedGroup = document.getElementById("groupFilter").value;
     let currentMonthIdx = monthsOrder.indexOf(month);
 
-    let listToSend = students.filter(s => {
+    let filtered = students.filter(s => {
         let matchesSearch = (s.name || "").toLowerCase().includes(search);
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
-        let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup);
+        let studentGroup = s.group || s.class || s.classGroup || "";
+        let matchesGroup = (selectedGroup === "All") || (studentGroup === selectedGroup);
         
         let isAvailableInMonth = true;
         if (s.joinedMonth) {
@@ -448,15 +512,8 @@ async function sendBulkProgress() {
         return matchesSearch && matchesGrade && matchesGroup && isAvailableInMonth;
     });
 
-    if (listToSend.length === 0) return alert("යවන්න ළමයි කවුරුත් නැහැ!");
-    if (!confirm(`${listToSend.length} දෙනෙකුට මැසේජ් යවන්නද?`)) return;
-
-    let statusDiv = document.getElementById("bulkStatus");
-
-    for (let i = 0; i < listToSend.length; i++) {
-        let s = listToSend[i];
+    let queue = filtered.map(s => {
         let score = s.marks?.[month] || 0;
-
         let sameGradeStudents = students.filter(st => st.grade === s.grade);
         let rankedInGrade = [...sameGradeStudents].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
         let rank = rankedInGrade.findIndex(rs => rs.name === s.name) + 1;
@@ -476,56 +533,70 @@ async function sendBulkProgress() {
                   `--------------------------\n\n` +
                   `Thank you!`;
 
-        statusDiv.innerText = `Sending to ${s.name} (${i + 1}/${listToSend.length})...`;
-        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-        await new Promise(resolve => setTimeout(resolve, 10000)); 
-    }
-    statusDiv.innerText = "✅ සියලුම මැසේජ් යවා අවසන්!";
+        return { student: s, message: msg };
+    });
+
+    startBulkQueue(queue, "📊 Bulk Progress Reports");
 }
 
-async function sendBulk3WeekReminders() {
+function sendBulk3WeekReminders() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
     let selectedGrade = document.getElementById("gradeFilter").value;
     let selectedGroup = document.getElementById("groupFilter").value;
     let currentMonthIdx = monthsOrder.indexOf(month);
 
-    let listToFilter = students.filter(s => {
+    let filtered = students.filter(s => {
         let matchesSearch = (s.name || "").toLowerCase().includes(search);
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
-        let matchesGroup = (selectedGroup === "All") || (s.group === selectedGroup);
+        let studentGroup = s.group || s.class || s.classGroup || "";
+        let matchesGroup = (selectedGroup === "All") || (studentGroup === selectedGroup);
+        
+        let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
+        let isUnpaid = (s.fees?.[month] !== "Paid");
         
         let isAvailableInMonth = true;
         if (s.joinedMonth) {
             let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
             if (currentMonthIdx < joinedIdx) isAvailableInMonth = false;
         }
-        return matchesSearch && matchesGrade && matchesGroup && isAvailableInMonth;
+        return matchesSearch && matchesGrade && matchesGroup && attendanceCount >= 3 && isUnpaid && isAvailableInMonth;
     });
 
-    let listToSend = listToFilter.filter(s => {
-        let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
-        let isUnpaid = (s.fees?.[month] !== "Paid");
-        return attendanceCount >= 3 && isUnpaid;
-    });
-
-    if (listToSend.length === 0) return alert("සති 3ක් සම්පූර්ණ කළ, ගෙවීම් පැහැර හැර ඇති සිසුන් මෙම ලිස්ට් එකේ නැත!");
-    if (!confirm(`${listToSend.length} දෙනෙකුට Reminder මැසේජ් යවන්නද?`)) return;
-
-    let statusDiv = document.getElementById("bulkStatus");
-
-    for (let i = 0; i < listToSend.length; i++) {
-        let s = listToSend[i];
-        
+    let queue = filtered.map(s => {
         let msg = `දෙමාපියන්ගේ අවධානය පිණිසයි,\n\n` +
                   `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 3ක් හෝ ඊට වැඩි ප්‍රමාණයක් පන්තියට පැමිණ ඇතත්, අදාළ මාසය සඳහා ගාස්තු ගෙවා ඇති බව පද්ධතියේ සටහන්ව නොමැත.\n\n` +
                   `කරුණාකර ඒ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
+        return { student: s, message: msg };
+    });
 
-        statusDiv.innerText = `Sending Reminder to ${s.name} (${i + 1}/${listToSend.length})...`;
-        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-        await new Promise(resolve => setTimeout(resolve, 10000));
-    }
-    statusDiv.innerText = "✅ සියලුම Reminders යවා අවසන්!";
+    startBulkQueue(queue, "⚠️ 3-Week Reminders");
+}
+
+function sendBulk4WeekReminders() {
+    let month = document.getElementById("monthSelect").value;
+    let currentMonthIdx = monthsOrder.indexOf(month);
+    
+    let filtered = students.filter(s => {
+        let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
+        let isUnpaid = (s.fees?.[month] !== "Paid");
+        
+        let isAvailableInMonth = true;
+        if (s.joinedMonth) {
+            let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
+            if (currentMonthIdx < joinedIdx) isAvailableInMonth = false;
+        }
+        return attendanceCount >= 4 && isUnpaid && isAvailableInMonth;
+    });
+
+    let queue = filtered.map(s => {
+        let msg = `*විශේෂ මතක් කිරීමයි - Excellence Maths Class*\n\n` +
+                  `දරුවා: *${s.name}*\n` +
+                  `ඔබගේ දරුවා ${month} මාසයේ සති 4ක්ම පන්තියට පැමිණ ඇතත්, ගාස්තු ගෙවා ඇති බව සටහන්ව නැත. කරුණාකර මේ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
+        return { student: s, message: msg };
+    });
+
+    startBulkQueue(queue, "🚨 4-Week Alerts");
 }
 
 function exportToExcel() {
@@ -539,49 +610,6 @@ function exportToExcel() {
     link.setAttribute("download", "Student_List_Backup.csv");
     document.body.appendChild(link);
     link.click();
-}
-
-function send4WeekRemind(idx, month) {
-    let s = students[idx];
-    let msg = `*දෙමාපියන්ගේ විශේෂ අවධානය පිණිසයි,* \n\n` +
-              `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 4ක්ම පන්තියට සහභาගී වී ඇත.\n\n` +
-              `නමුත් පද්ධතියට අනුව එම මාසය සඳහා වන ගාස්තු තවමත් ගෙවා ඇති බව සටහන් වී නොමැත. කරුණාකර අද දින මේ පිළිබඳව සොයා බලා කටයුතු කරන ලෙස කාරුණිකව දන්වා සිටිමු. \n\n` +
-              `ස්තූතියි! \n*Excellence Maths Class*`;
-    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-}
-
-async function sendBulk4WeekReminders() {
-    let month = document.getElementById("monthSelect").value;
-    let currentMonthIdx = monthsOrder.indexOf(month);
-    
-    let listToSend = students.filter(s => {
-        let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
-        let isUnpaid = (s.fees?.[month] !== "Paid");
-        
-        let isAvailableInMonth = true;
-        if (s.joinedMonth) {
-            let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
-            if (currentMonthIdx < joinedIdx) isAvailableInMonth = false;
-        }
-        return attendanceCount >= 4 && isUnpaid && isAvailableInMonth;
-    });
-
-    if (listToSend.length === 0) return alert("සති 4ම සම්පූර්ණ කළ, ගෙවීම් පැහැර හැර ඇති සිසුන් මෙම ලිස්ට් එකේ නැත!");
-    if (!confirm(`${listToSend.length} දෙනෙකුට 4-Week Alert එක යවන්නද?`)) return;
-
-    let statusDiv = document.getElementById("bulkStatus");
-
-    for (let i = 0; i < listToSend.length; i++) {
-        let s = listToSend[i];
-        let msg = `*විශේෂ මතක් කිරීමයි - Excellence Maths Class*\n\n` +
-                  `දරුවා: *${s.name}*\n` +
-                  `ඔබගේ දරුවා ${month} මාසයේ සති 4ක්ම පන්තියට පැමිණ ඇතත්, ගාස්තු ගෙවා ඇති බව සටහන්ව නැත. කරුණාකර මේ පිළිබඳව සොයා බලන්න. ස්තූතියි!`;
-
-        statusDiv.innerText = `Sending to ${s.name} (${i + 1}/${listToSend.length})...`;
-        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-        await new Promise(resolve => setTimeout(resolve, 10000));
-    }
-    statusDiv.innerText = "✅ සියලුම 4-Week Alerts යවා අවසන්!";
 }
 
 function showSection(sectionId) {
