@@ -629,3 +629,47 @@ function showSection(sectionId) {
         }
     });
 }
+
+// ✉️ Send Any Custom Message to Filtered Students Queue
+function sendCustomBulkMessage() {
+    let msgText = document.getElementById("customBulkMsg").value.trim();
+    
+    if (msgText === "") {
+        alert("කරුණාකර යැවීමට අවශ්‍ය මැසේජ් එක ඇතුළත් කරන්න!");
+        return;
+    }
+
+    let month = document.getElementById("monthSelect").value;
+    let search = document.getElementById("searchBar").value.toLowerCase();
+    let selectedGrade = document.getElementById("gradeFilter").value;
+    let selectedGroup = document.getElementById("groupFilter").value;
+    let currentMonthIdx = monthsOrder.indexOf(month);
+
+    // Filter වෙලා තියෙන ළමයි ලිස්ට් එක ගන්නවා
+    let filtered = students.filter(s => {
+        let matchesSearch = (s.name || "").toLowerCase().includes(search);
+        let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
+        let studentGroup = s.group || s.class || s.classGroup || "";
+        let matchesGroup = (selectedGroup === "All") || (studentGroup === selectedGroup);
+        
+        let isAvailableInMonth = true;
+        if (s.joinedMonth) {
+            let joinedIdx = monthsOrder.indexOf(s.joinedMonth);
+            if (currentMonthIdx < joinedIdx) isAvailableInMonth = false;
+        }
+        return matchesSearch && matchesGrade && matchesGroup && isAvailableInMonth;
+    });
+
+    // Queue එක හදනවා
+    let queue = filtered.map(s => {
+        // ළමයාගේ නම එක්ක මැසේජ් එක ලස්සනට Format කරගන්නවා
+        let formattedMsg = `ආදරණීය දෙමාපියන්ගේ / දරුවාගේ (*${s.name}*) අවධානය පිණිසයි,\n\n` +
+                           `${msgText}\n\n` +
+                           `ස්තූතියි!\n*Excellence Maths Class*`;
+
+        return { student: s, message: formattedMsg };
+    });
+
+    // අර අපි හදපු Modal Queue එකෙන්ම යවනවා
+    startBulkQueue(queue, "📢 Custom Notice Broadcast");
+}
