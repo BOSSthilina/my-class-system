@@ -383,6 +383,7 @@ function toggleDarkMode() {
     }
 }
 
+// 🎉 Check Birthdays & Display Individual Cards
 function checkBirthdays() {
     let today = new Date();
     let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
@@ -391,12 +392,32 @@ function checkBirthdays() {
 
     let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
     
-    if(birthdaysToday.length > 0) {
-        let names = birthdaysToday.map(s => s.name).join(", ");
+    if (birthdaysToday.length > 0) {
+        // එක් එක් ළමයා වෙන වෙනම ලිස්ට් එකක් විදිහට හදනවා
+        let itemsHtml = birthdaysToday.map(s => {
+            let sIdx = students.indexOf(s);
+            return `
+                <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding:10px 12px; margin-top:8px; border-radius:8px; border:1px solid #ffe0b2; color:black;">
+                    <div>
+                        <b style="font-size:14px;">🎂 ${s.name}</b> <br>
+                        <small style="color:gray;">📞 ${s.phone || 'No phone'}</small>
+                    </div>
+                    <button onclick="sendSingleBirthdayWish(${sIdx})" style="background:#25D366; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">
+                        📲 Wish ${s.name.split(' ')[0]}
+                    </button>
+                </div>
+            `;
+        }).join("");
+
         alertDiv.innerHTML = `
-            <div style="background:#fff3e0; padding:15px; border-radius:10px; border:1px dashed #ff9800; display:flex; justify-content:space-between; align-items:center;">
-                <span>🎉 Today's Birthdays: <b>${names}</b> 🎂</span>
-                <button onclick="sendBulkBirthdays()" style="background:#25D366; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">📲 Send WhatsApp Wishes</button>
+            <div style="background:#fff3e0; padding:15px; border-radius:12px; border:1px dashed #ff9800;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h4 style="margin:0; color:#e67e22; font-size:15px;">🎉 Today's Birthdays (${birthdaysToday.length}) 🎂</h4>
+                    <button onclick="sendBulkBirthdaysModal()" style="background:#8e44ad; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">
+                        🚀 Send All (Modal)
+                    </button>
+                </div>
+                ${itemsHtml}
             </div>
         `;
         alertDiv.style.display = "block";
@@ -405,27 +426,34 @@ function checkBirthdays() {
     }
 }
 
-async function sendBulkBirthdays() {
+// 📲 එක ළමයෙක්ට විතරක් වෙන වෙනම Wish කරන්න
+function sendSingleBirthdayWish(idx) {
+    let s = students[idx];
+    let msg = `🌟 *HAPPY BIRTHDAY!* 🌟\n\n` +
+              `ආදරණීය *${s.name}*,\n` +
+              `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! 🎂✨\n\n` +
+              `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
+              `මීට,\n*Thilina Sir*`;
+
+    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// 🚀 Modal Queue එක හරහා ඔක්කොටම එකින් එක යවන්න
+function sendBulkBirthdaysModal() {
     let today = new Date();
     let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
     let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
 
-    if (!confirm(`${birthdaysToday.length} දෙනෙකුට සුබපැතුම් යවන්නද?`)) return;
-
-    for (let i = 0; i < birthdaysToday.length; i++) {
-        let s = birthdaysToday[i];
+    let queue = birthdaysToday.map(s => {
         let msg = `🌟 *HAPPY BIRTHDAY!* 🌟\n\n` +
                   `ආදරණීය *${s.name}*,\n` +
                   `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! 🎂✨\n\n` +
                   `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
                   `මීට,\n*Thilina Sir*`;
+        return { student: s, message: msg };
+    });
 
-        window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
-        if (birthdaysToday.length > 1) {
-            await new Promise(r => setTimeout(r, 5000));
-        }
-    }
-    alert("සියලුම සුබපැතුම් යවා අවසන්!");
+    startBulkQueue(queue, "🎉 Birthday Wishes Queue");
 }
 
 function send4WeekRemind(idx, month) {
