@@ -693,7 +693,7 @@ function sendCustomBulkMessage() {
         // ළමයාගේ නම එක්ක මැසේජ් එක ලස්සනට Format කරගන්නවා
         let formattedMsg = `ආදරණීය දෙමාපියන්ගේ / දරුවාගේ (*${s.name}*) අවධානය පිණිසයි,\n\n` +
                            `${msgText}\n\n` +
-                           `ස්තූතියි!\n*Excellence Maths Class*`;
+                           `ස්තූතියි!\n*Thilina Sir*`;
 
         return { student: s, message: formattedMsg };
     });
