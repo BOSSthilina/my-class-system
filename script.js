@@ -750,21 +750,26 @@ function importJSONBackup(event) {
     if (!file) return;
 
     let reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
             let importedData = JSON.parse(e.target.result);
             if (Array.isArray(importedData)) {
                 if (confirm("ඔබට තහවුරුද? දැනට ඇති Data සියල්ල වෙනුවට මෙම Backup එක Load වේ!")) {
                     students = importedData;
-                    localStorage.setItem("students", JSON.stringify(students));
-                    renderStudents();
-                    alert("✅ Data සාර්ථකව Restore විය!");
+                    await saveData(); // Update the Google Apps Script database
+                    renderStudents(); // Refresh the student list on screen
+                    checkBirthdays(); // Re-check for any birthdays in the new data
+                    alert("Data successfully restored! (දත්ත සාර්ථකව Restore කරන ලදී!)");
+                    
+                    // Clear the file input so the same file can be uploaded again if needed
+                    event.target.value = ""; 
                 }
             } else {
-                alert("❌ අසංගත (Invalid) Backup File එකකි!");
+                alert("Invalid data format. Please upload a valid Backup JSON.");
             }
-        } catch (err) {
-            alert("❌ File එක කියවීමේ දෝෂයක් ඇත!");
+        } catch (error) {
+            alert("Error reading file! (ෆයිල් එක කියවීමේදී දෝෂයක්!)");
+            console.error("Import Error:", error);
         }
     };
     reader.readAsText(file);
