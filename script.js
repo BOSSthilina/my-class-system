@@ -200,7 +200,7 @@ function updatePendingList() {
         if (unpaid.length > 0) {
             let namesList = unpaid.map((s, i) => `${i+1}. ${s.name} (${s.grade || 'N/A'})`).join("\n");
             
-            let waMsg = `*⚠️ PENDING PAYMENTS - ${groupName} ${selectedGrade !== "All" ? `(${selectedGrade})` : ""Trigger}*\n` +
+            let waMsg = `*⚠️ PENDING PAYMENTS - ${groupName} ${selectedGrade !== "All" ? `(${selectedGrade})` : ""}*\n`
                         `*Month:* ${month}\n` +
                         `--------------------------\n` +
                         `${namesList}\n` +
@@ -305,12 +305,16 @@ function addOrUpdateStudent() {
             marks: {}, attendance: {}, fees: {} 
         });
     } else {
-        students[editIdx].name = name;
-        students[editIdx].dob = dob;
-        students[editIdx].phone = phone;
-        students[editIdx].grade = grade;
-        students[editIdx].group = group;
-        students[editIdx].fee = fee;
+    // Edit කරන අවස්ථාව
+    let existingJoinedMonth = students[editIdx].joinedMonth || currentMonth;
+
+    students[editIdx].name = name;
+    students[editIdx].dob = dob;
+    students[editIdx].phone = phone;
+    students[editIdx].grade = grade;
+    students[editIdx].group = group;
+    students[editIdx].fee = fee;
+    students[editIdx].joinedMonth = existingJoinedMonth; // එකතු කරන්න
         
         if(!students[editIdx].marks) students[editIdx].marks = {};
         if(!students[editIdx].attendance) students[editIdx].attendance = {};
