@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Manager Pro</title>
-    <!-- Icons සඳහා Font Awesome ඇඩ් කළා -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 🚀 id="mainContent" එක display:block කළා (දැන් කෙලින්ම සිස්ටම් එක පේනවා) -->
     <div id="mainContent" style="display:block;">
         
-        <!-- SimplyTek Style Modern Navigation Bar -->
+        <!-- Navigation Bar -->
         <header class="main-header" style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
             <div class="header-left">
                 <a href="#" style="text-decoration: none; display: flex; flex-direction: column;">
@@ -36,7 +35,7 @@
             </div>
         </header>
         
-        <!-- Global Filters (සෙවුම් කොටස) -->
+        <!-- Global Filters -->
         <div class="card" style="margin-bottom: 20px;">
             <input type="text" id="searchBar" placeholder="🔍 Search Name..." onkeyup="renderStudents()">
             <div style="display: flex; gap: 10px; margin-top: 10px;">
@@ -47,7 +46,7 @@
                     <option value="April">April</option>
                     <option value="May">May</option>
                     <option value="June">June</option>
-                    <option value="July" >July</option>
+                    <option value="July">July</option>
                     <option value="August">August</option>
                     <option value="September" selected>September</option>
                     <option value="October">October</option>
@@ -106,9 +105,7 @@
                 <option value="Grade 6 New">Grade 6 New</option>
                 <option value="Grade 7 Saturday 8:30-10:30">Grade 7 Saturday 8:30-10:30</option>
                 <option value="Grade 8 Tuesday 3:00-5:00">Grade 8 Tuesday 3:00-5:00</option>
-                <option value="Grade 8 Sunday 2:30-4:30">Grade 8 Sunday 2:30-4:30</option>
                 <option value="Grade 8 Monday 3:00-5:00">Grade 8 Monday 3:00-5:00</option>
-                <option value="Grade 9 Maths Sunday 8:30-10:30">Grade 9 Maths Sunday 8:30-10:30</option>
                 <option value="Grade 9 Maths Saturday 2:30-4:30">Grade 9 Maths Saturday 2:30-4:30</option>
                 <option value="Grade 9 Maths Monday 5:30-7:30">Grade 9 Maths Monday 5:30-7:30</option>
                 <option value="Grade 10 Thursday 3:00-5:00">Grade 10 Thursday 3:00-5:00</option>
@@ -125,7 +122,7 @@
         <!-- Dashboard Section -->
         <div class="nav-section" id="summarySection">
             <div class="card" id="incomeSummary" style="background: #f8f9fa; border-left: 8px solid #2980b9; margin-bottom: 20px; color: black;">
-                <h3>📊 Class Summary (<span id="summaryMonth">May</span>)</h3>
+                <h3>📊 Class Summary (<span id="summaryMonth">September</span>)</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; text-align: center;">
                     <div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
                         <small style="color: gray;">Total Expected</small>
@@ -169,14 +166,26 @@
                     📥 Export Student List (Excel/CSV)
                 </button>
                 
-                <!-- ✉️ Custom Message Box Section -->
+                <!-- Custom Message Box Section -->
                 <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
-                <textarea id="customBulkMsg" placeholder="✍️ මෙතන ඔයාට යවන්න ඕනේ ඕනෑම Custom Message එකක් ලියන්න..." style="width: 100%; height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; font-size: 13px; box-sizing: border-box;"></textarea>
+                    <textarea id="customBulkMsg" placeholder="✍️ මෙතන ඔයාට යවන්න ඕනේ ඕනෑම Custom Message එකක් ලියන්න..." style="width: 100%; height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; font-size: 13px; box-sizing: border-box;"></textarea>
                     
-                <button onclick="sendCustomBulkMessage()" style="background: #8e44ad; width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 8px;">
+                    <button onclick="sendCustomBulkMessage()" style="background: #8e44ad; width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 8px;">
                         📢 Send Custom Message to All
-                </button>
-</div>
+                    </button>
+                </div>
+
+                <!-- JSON Backup & Restore Buttons -->
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button onclick="exportJSONBackup()" style="background: #27ae60; flex: 1; padding: 10px; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                        💾 Export Backup (JSON)
+                    </button>
+                    
+                    <label style="background: #e67e22; flex: 1; padding: 10px; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center; display: block;">
+                        📂 Restore Backup
+                        <input type="file" id="jsonInput" accept=".json" onchange="importJSONBackup(event)" style="display: none;">
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -193,7 +202,7 @@
 
     </div>
 
-    <!-- 🚀 මෙන්න මෙතනට තමයි Bulk WhatsApp Sending Modal Popup එක එකතු කළේ -->
+    <!-- Bulk WhatsApp Sending Modal Popup -->
     <div id="bulkModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center;">
         <div style="background:white; padding:25px; border-radius:12px; width:90%; max-width:400px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.3); color:#333;">
             <h3 id="bulkModalTitle" style="margin-top:0; color:#25D366;">📲 Send WhatsApp Messages</h3>
