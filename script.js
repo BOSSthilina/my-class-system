@@ -92,6 +92,7 @@ function renderStudents() {
                 ${badge ? `<span style="background:#f1c40f; color:black; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:bold;">${badge}</span>` : ""}
             </div>
             <small>${s.group} | Fee: Rs.${s.fee}</small>
+            ${isPaid && s.paymentDates && s.paymentDates[month] ? `<div style="font-size:11px; color:#27ae60; margin-top:3px;">✅ Paid on: ${s.paymentDates[month]}</div>` : ''}
             
             <div style="margin:10px 0;">
                 ${s.attendance[month].map((a, i) => `<button class="att-btn ${a==='P'?'present':a==='A'?'absent':''}" onclick="mark(${sIdx},'${month}',${i})">${a}</button>`).join('')}
