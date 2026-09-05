@@ -167,6 +167,7 @@ function sendProgress(idx, month) {
 
 function updatePendingList() {
     let month = document.getElementById("monthSelect").value;
+    let selectedGrade = document.getElementById("gradeFilter").value;
     let selectedGroup = document.getElementById("groupFilter").value;
     let display = document.getElementById("pendingDisplay");
     display.innerHTML = "";
@@ -181,6 +182,10 @@ function updatePendingList() {
         let unpaid = students.filter(s => {
             let studentGroup = s.group || s.class || s.classGroup || "";
             let matchesGroup = studentGroup === groupName;
+            
+            // Grade Filter එක හරියටම චෙක් කරනවා
+            let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
+            
             let isUnpaid = (!s.fees || s.fees[month] !== "Paid");
             
             let isAvailableInMonth = true;
@@ -189,13 +194,13 @@ function updatePendingList() {
                 if (currentMonthIdx < joinedIdx) isAvailableInMonth = false;
             }
             
-            return matchesGroup && isUnpaid && isAvailableInMonth;
+            return matchesGroup && matchesGrade && isUnpaid && isAvailableInMonth;
         });
 
         if (unpaid.length > 0) {
-            let namesList = unpaid.map((s, i) => `${i+1}. ${s.name}`).join("\n");
+            let namesList = unpaid.map((s, i) => `${i+1}. ${s.name} (${s.grade || 'N/A'})`).join("\n");
             
-            let waMsg = `*⚠️ PENDING PAYMENTS - ${groupName}*\n` +
+            let waMsg = `*⚠️ PENDING PAYMENTS - ${groupName} ${selectedGrade !== "All" ? `(${selectedGrade})` : ""Trigger}*\n` +
                         `*Month:* ${month}\n` +
                         `--------------------------\n` +
                         `${namesList}\n` +
@@ -207,17 +212,18 @@ function updatePendingList() {
             div.style.borderBottom = "1px solid #ddd";
             div.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <small><b>📌 ${groupName}</b></small>
+                    <small><b>📌 ${groupName} ${selectedGrade !== "All" ? `(${selectedGrade})` : ""}</b></small>
                     <span style="font-size:10px; color:#e74c3c; font-weight:bold;">${unpaid.length} Pending</span>
                 </div>
                 <pre style="font-size:11px; background:#f9f9f9; padding:8px; border-radius:4px; margin:8px 0; border:1px solid #eee; color: black;">${namesList}</pre>
-                <button onclick="copyToClipboard('${encodeURIComponent(waMsg)}')" style="background:#25D366; font-size:11px; padding:6px; width:100%; border-radius:5px; color:white; border:none; cursor:pointer;">📋 Copy ${groupName} List</button>           `;
+                <button onclick="copyToClipboard('${encodeURIComponent(waMsg)}')" style="background:#25D366; font-size:11px; padding:6px; width:100%; border-radius:5px; color:white; border:none; cursor:pointer;">📋 Copy ${groupName} List</button>
+            `;
             display.appendChild(div);
         }
     });
 
     if (display.innerHTML === "") {
-        display.innerHTML = "<p style='font-size:12px; color:gray; text-align:center; padding:10px;'>මෙම පන්තියේ සියලුම දෙනා ගෙවීම් කර ඇත. ✅</p>";
+        display.innerHTML = "<p style='font-size:12px; color:gray; text-align:center; padding:10px;'>තෝරාගත් ශ්‍රේණිය/පන්තිය සඳහා සියලුම දෙනා ගෙවීම් කර ඇත. ✅</p>";
     }
 }
 
