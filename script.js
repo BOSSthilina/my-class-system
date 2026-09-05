@@ -59,6 +59,7 @@ function renderStudents() {
         }
         
         return matchesSearch && matchesGrade && matchesGroup && isAvailableInMonth;
+        
     });
     
     filteredList.forEach((s) => {
@@ -768,4 +769,186 @@ function importJSONBackup(event) {
         }
     };
     reader.readAsText(file);
+}
+
+// PDF Report එක Generate කරන Function එක
+function downloadReportCard(idx, month) {
+    let s = students[idx];
+    let score = s.marks?.[month] || 0;
+    
+    // දවස් කීයක් ආවද කියල ගණනය කිරීම
+    let attendanceArray = s.attendance?.[month] || ["-","-","-","-"];
+    let presentCount = attendanceArray.filter(a => a === "P").length;
+    
+    // පන්තියේ ස්ථානය (Rank) ගණනය කිරීම
+    let sameGradeStudents = students.filter(st => st.grade === s.grade);
+    let rankedInGrade = [...sameGradeStudents].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
+    let rank = rankedInGrade.findIndex(rs => rs.name === s.name) + 1;
+    
+    // PDF එකට අදාළ HTML Design එක
+    let printDiv = document.createElement("div");
+    printDiv.style.padding = "30px";
+    printDiv.style.fontFamily = "sans-serif";
+    printDiv.style.color = "#333";
+    printDiv.innerHTML = `
+        <div style="text-align: center; border-bottom: 2px solid #2980b9; padding-bottom: 10px; margin-bottom: 20px;">
+            <h1 style="color: #2980b9; margin: 0;">EXCELLENCE MATHS CLASS</h1>
+            <h3 style="margin: 5px 0;">Student Progress Report - ${month}</h3>
+        </div>
+        <div style="font-size: 16px; line-height: 1.8;">
+            <p><b>Student Name:</b> ${s.name}</p>
+            <p><b>Grade:</b> ${s.grade || 'N/A'}</p>
+            <p><b>Group/Class:</b> ${s.group || 'N/A'}</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr style="background: #f2f2f2;">
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Subject / Criteria</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Details</th>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 12px;">Monthly Marks</td>
+                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; font-size: 18px;">${score}</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 12px;">Class Rank</td>
+                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold;">${rank}</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 12px;">Attendance</td>
+                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold;">${presentCount} / 4 Days</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 12px;">Fee Status</td>
+                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; color: ${s.fees?.[month] === "Paid" ? "green" : "red"};">${s.fees?.[month] || "Unpaid"}</td>
+            </tr>
+        </table>
+        <div style="margin-top: 60px; text-align: right;">
+            <p>.......................................</p>
+            <p><b>Thilina Sir (Signature)</b></p>
+        </div>
+    `;
+    
+    // PDF එක Download වෙන විදිහ සකස් කිරීම
+    let opt = {
+        margin:       10,
+        filename:     `${s.name}_${month}_Report.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    // PDF එක හදලා Save කරන්න
+    html2pdf().set(opt).from(printDiv).save();
+}
+// ========================================================
+// 🚀 BULK QUEUE CONTROLLER & PDF REPORT GENERATOR
+// ========================================================
+
+function updateBulkModalUI() {
+    let total = bulkQueue.length;
+    let current = bulkCurrentIndex;
+    let percentage = total > 0 ? (current / total) * 100 : 0;
+    
+    document.getElementById("bulkProgressBar").style.width = percentage + "%";
+    
+    if (current < total) {
+        let item = bulkQueue[current];
+        document.getElementById("bulkModalStatus").innerHTML = 
+            `<b>Progress:</b> ${current} / ${total} sent<br>` +
+            `<b>Next Student:</b> ${item.student.name} (${item.student.phone || 'No phone'})`;
+        document.getElementById("bulkSendBtn").innerText = "🚀 Send Next Message";
+    } else {
+        document.getElementById("bulkModalStatus").innerHTML = `✅ All messages processed successfully!`;
+        document.getElementById("bulkSendBtn").innerText = "✔ Done";
+    }
+}
+
+function sendNextBulkMessage() {
+    if (bulkCurrentIndex < bulkQueue.length) {
+        let item = bulkQueue[bulkCurrentIndex];
+        if (item.student.phone) {
+            window.open(`https://wa.me/${item.student.phone}?text=${encodeURIComponent(item.message)}`, '_blank');
+        }
+        bulkCurrentIndex++;
+        updateBulkModalUI();
+    } else {
+        closeBulkModal();
+    }
+}
+
+function closeBulkModal() {
+    document.getElementById("bulkModal").style.display = "none";
+}
+
+// PDF Report Card Generator Function
+function downloadReportCard(idx, month) {
+    let s = students[idx];
+    let score = s.marks?.[month] || 0;
+    
+    let attendanceArray = s.attendance?.[month] || ["-","-","-","-"];
+    let presentCount = attendanceArray.filter(a => a === "P").length;
+    
+    let sameGradeStudents = students.filter(st => st.grade === s.grade);
+    let rankedInGrade = [...sameGradeStudents].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
+    let rank = rankedInGrade.findIndex(rs => rs.name === s.name) + 1;
+    
+    let printDiv = document.createElement("div");
+    printDiv.style.padding = "30px";
+    printDiv.style.fontFamily = "sans-serif";
+    printDiv.style.color = "#333";
+    printDiv.innerHTML = `
+        <div style="text-align: center; border-bottom: 2px solid #2980b9; padding-bottom: 10px; margin-bottom: 20px;">
+            <h1 style="color: #2980b9; margin: 0;">EXCELLENCE MATHS CLASS</h1>
+            <h3 style="margin: 5px 0;">Student Progress Report - ${month}</h3>
+        </div>
+        <div style="font-size: 16px; line-height: 1.8;">
+            <p><b>Student Name:</b> ${s.name}</p>
+            <p><b>Grade:</b> ${s.grade || 'N/A'}</p>
+            <p><b>Group/Class:</b> ${s.group || 'N/A'}</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr style="background: #f2f2f2;">
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Subject / Criteria</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Details</th>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 12px;">Monthly Marks</td>
+                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; font-size: 18px;">${score}</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 12px;">Class Rank</td>
+                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold;">${rank}</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 12px;">Attendance</td>
+                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold;">${presentCount} / 4 Days</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 12px;">Fee Status</td>
+                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; color: ${s.fees?.[month] === "Paid" ? "green" : "red"};">${s.fees?.[month] || "Unpaid"}</td>
+            </tr>
+        </table>
+        <div style="margin-top: 60px; text-align: right;">
+            <p>.......................................</p>
+            <p><b>Thilina Sir (Signature)</b></p>
+        </div>
+    `;
+    
+    let opt = {
+        margin:       10,
+        filename:     `${s.name}_${month}_Report.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    html2pdf().set(opt).from(printDiv).save();
+}
+
+function toggleExcused(sIdx, month) {
+    let s = students[sIdx];
+    if (!s.fees) s.fees = {};
+    s.fees[month] = s.fees[month] === 'Excused' ? 'Unpaid' : 'Excused';
+    saveData();
+    renderStudents();
 }
