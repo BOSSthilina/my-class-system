@@ -732,3 +732,40 @@ async function toggleExcused(idx, month) {
     await saveData();
     renderStudents();
 }
+
+// 📤 1. Data Backup එක JSON File එකක් විදිහට Download කිරීම
+function exportJSONBackup() {
+    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(students, null, 2));
+    let downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `Class_Manager_Backup_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+}
+
+// 📥 2. JSON File එකෙන් System එකට Data Restore කිරීම
+function importJSONBackup(event) {
+    let file = event.target.files[0];
+    if (!file) return;
+
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            let importedData = JSON.parse(e.target.result);
+            if (Array.isArray(importedData)) {
+                if (confirm("ඔබට තහවුරුද? දැනට ඇති Data සියල්ල වෙනුවට මෙම Backup එක Load වේ!")) {
+                    students = importedData;
+                    localStorage.setItem("students", JSON.stringify(students));
+                    renderStudents();
+                    alert("✅ Data සාර්ථකව Restore විය!");
+                }
+            } else {
+                alert("❌ අසංගත (Invalid) Backup File එකකි!");
+            }
+        } catch (err) {
+            alert("❌ File එක කියවීමේ දෝෂයක් ඇත!");
+        }
+    };
+    reader.readAsText(file);
+}
