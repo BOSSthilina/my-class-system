@@ -109,6 +109,9 @@ function renderStudents() {
                 <button onclick="send3WeekRemind(${sIdx}, '${month}')" style="background:#f39c12; font-size:12px; padding:8px;">⚠️ Remind</button>
                 <button onclick="sendProgress(${sIdx}, '${month}', ${rank})" style="background:#3498db; font-size:12px; padding:8px;">📊 Rank</button>
                 <button onclick="send4WeekRemind(${sIdx}, '${month}')" style="background:#c0392b; font-size:12px; padding:8px; margin-top:5px;">🚨 4 Week Alert</button>
+                <button onclick="toggleExcused(${sIdx}, '${month}')" style="background:${s.fees[month]==='Excused'?'#8e44ad':'#9b59b6'}; font-size:12px; padding:8px; color:white; border:none; border-radius:4px; cursor:pointer;">
+                ${s.fees[month] === 'Excused' ? '🚫 Excused' : 'Skip Pending'}
+                </button>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed #ddd; padding-top: 8px;">
@@ -184,7 +187,7 @@ function updatePendingList() {
             let matchesGroup = studentGroup === groupName;
             
             let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
-            let isUnpaid = (!s.fees || s.fees[month] !== "Paid");
+            let isUnpaid = (!s.fees || (s.fees[month] !== "Paid" && s.fees[month] !== "Excused"));
             
             let isAvailableInMonth = true;
             if (s.joinedMonth) {
@@ -345,15 +348,20 @@ function updateIncomeSummary(dataToShow) {
     let counts = {}; 
 
     listToCalculate.forEach(s => {
-        let fee = parseFloat(s.fee) || 0;
+    let fee = parseFloat(s.fee) || 0;
+    
+    // Excused කර නැතිනම් පමණක් Expected Income එකට එකතු කරයි
+    if (!s.fees || s.fees[month] !== "Excused") {
         totalExpected += fee;
-        if (s.fees && s.fees[month] === "Paid") {
-            totalCollected += fee;
-        }
+    }
+    
+    if (s.fees && s.fees[month] === "Paid") {
+        totalCollected += fee;
+    }
 
-        let g = s.grade || "N/A";
-        counts[g] = (counts[g] || 0) + 1;
-    });
+    let g = s.grade || "N/A";
+    counts[g] = (counts[g] || 0) + 1;
+});
 
     let totalPending = totalExpected - totalCollected;
 
@@ -709,4 +717,18 @@ function sendCustomBulkMessage() {
 
     // අර අපි හදපු Modal Queue එකෙන්ම යවනවා
     startBulkQueue(queue, "📢 Custom Notice Broadcast");
+}
+
+async function toggleExcused(idx, month) {
+    if (!students[idx].fees) students[idx].fees = {};
+    
+    // Toggle Logic: Excused නම් Unpaid කරයි, නැත්නම් Excused කරයි
+    if (students[idx].fees[month] === "Excused") {
+        students[idx].fees[month] = "Unpaid";
+    } else {
+        students[idx].fees[month] = "Excused";
+    }
+    
+    await saveData();
+    renderStudents();
 }
