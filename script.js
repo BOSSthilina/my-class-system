@@ -229,32 +229,26 @@ function updatePendingList() {
     }
 }
 
+// යාවත්කාලීන කළ togglePaid Function එක
 async function togglePaid(idx, month) {
     let s = students[idx];
     if (!s.fees) s.fees = {};
-    
+    if (!s.paymentDates) s.paymentDates = {}; // අලුතින් එකතු කළ කොටස
+
     if (s.fees[month] === "Paid") {
         s.fees[month] = "Unpaid";
+        delete s.paymentDates[month]; // Unpaid කළොත් Timestamp එක මැකෙනවා
     } else {
         s.fees[month] = "Paid";
         
-        let date = new Date().toLocaleDateString('en-GB'); 
+        // දැනට තියෙන දිනය සහ වෙලාව ගන්නවා
+        let now = new Date();
+        let dateString = now.toLocaleDateString('en-GB') + " - " + now.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'});
+        s.paymentDates[month] = dateString; // System එකේ සේව් වෙනවා
+        
         let receiptNo = "RCPT-" + Date.now().toString().slice(-6); 
         
-        let msg = `━━━━━━━━━━━━━━━━━━━━
-🌟 *EXCELLENCE MATHS CLASS* 🌟
-━━━━━━━━━━━━━━━━━━━━
-*DATE:* ${date}
-*RECEIPT NO:* #${receiptNo}
-━━━━━━━━━━━━━━━━━━━━
-*NAME:* ${s.name}
-*GRADE:* ${s.grade || 'N/A'}
-*MONTH:* ${month}
-*FEE:* Rs. ${s.fee}.00
-━━━━━━━━━━━━━━━━━━━━
-*STATUS:* ✅ *SUCCESSFULLY PAID*
-━━━━━━━━━━━━━━━━━━━━
-ස්තුතියි! පන්තියේදී හමුවෙමු.`;
+        let msg = `━━━━━━━━━━━━━━━━━━━━\n🌟 *EXCELLENCE MATHS CLASS* 🌟\n━━━━━━━━━━━━━━━━━━━━\n*DATE:* ${dateString}\n*RECEIPT NO:* #${receiptNo}\n━━━━━━━━━━━━━━━━━━━━\n*NAME:* ${s.name}\n*GRADE:* ${s.grade || 'N/A'}\n*MONTH:* ${month}\n*FEE:* Rs. ${s.fee}.00\n━━━━━━━━━━━━━━━━━━━━\n*STATUS:* ✅ *SUCCESSFULLY PAID*\n━━━━━━━━━━━━━━━━━━━━\nස්තුතියි! පන්තියේදී හමුවෙමු.`;
 
         window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
