@@ -183,9 +183,7 @@ function updatePendingList() {
             let studentGroup = s.group || s.class || s.classGroup || "";
             let matchesGroup = studentGroup === groupName;
             
-            // Grade Filter එක හරියටම චෙක් කරනවා
             let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
-            
             let isUnpaid = (!s.fees || s.fees[month] !== "Paid");
             
             let isAvailableInMonth = true;
@@ -200,7 +198,8 @@ function updatePendingList() {
         if (unpaid.length > 0) {
             let namesList = unpaid.map((s, i) => `${i+1}. ${s.name} (${s.grade || 'N/A'})`).join("\n");
             
-            let waMsg = `*⚠️ PENDING PAYMENTS - ${groupName} ${selectedGrade !== "All" ? `(${selectedGrade})` : ""}*\n`
+            // 🛑 මෙන්න මෙතන පළමු පේළිය අගට + එකතු කර ඇත
+            let waMsg = `*⚠️ PENDING PAYMENTS - ${groupName} ${selectedGrade !== "All" ? `(${selectedGrade})` : ""}*\n` +
                         `*Month:* ${month}\n` +
                         `--------------------------\n` +
                         `${namesList}\n` +
