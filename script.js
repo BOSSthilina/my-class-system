@@ -59,7 +59,6 @@ function renderStudents() {
         }
         
         return matchesSearch && matchesGrade && matchesGroup && isAvailableInMonth;
-        
     });
     
     filteredList.forEach((s) => {
@@ -118,7 +117,7 @@ function renderStudents() {
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed #ddd; padding-top: 8px;">
                 <button onclick="editStudent(${sIdx})" style="background:none; color:gray; border:none; font-size:11px; cursor:pointer;">📝 Edit Details</button>
-                <button onclick="deleteStudent(${sIdx})" style="background:none; color:#e74c3c; border:none; font-size:11px; cursor:pointer; font-weight:bold;">🗑️ Remove Student</button>
+                <button onclick="deleteStudent(${sIdx})" style="background:none; color:#e74c3c; border:none; font-size:11px; cursor:pointer; font-weight:bold;">🗑️️ Remove Student</button>
             </div>
         `;
         list.appendChild(card);
@@ -203,7 +202,6 @@ function updatePendingList() {
         if (unpaid.length > 0) {
             let namesList = unpaid.map((s, i) => `${i+1}. ${s.name} (${s.grade || 'N/A'})`).join("\n");
             
-            // 🛑 මෙන්න මෙතන පළමු පේළිය අගට + එකතු කර ඇත
             let waMsg = `*⚠️ PENDING PAYMENTS - ${groupName} ${selectedGrade !== "All" ? `(${selectedGrade})` : ""}*\n` +
                         `*Month:* ${month}\n` +
                         `--------------------------\n` +
@@ -231,22 +229,20 @@ function updatePendingList() {
     }
 }
 
-// යාවත්කාලීන කළ togglePaid Function එක
 async function togglePaid(idx, month) {
     let s = students[idx];
     if (!s.fees) s.fees = {};
-    if (!s.paymentDates) s.paymentDates = {}; // අලුතින් එකතු කළ කොටස
+    if (!s.paymentDates) s.paymentDates = {};
 
     if (s.fees[month] === "Paid") {
         s.fees[month] = "Unpaid";
-        delete s.paymentDates[month]; // Unpaid කළොත් Timestamp එක මැකෙනවා
+        delete s.paymentDates[month];
     } else {
         s.fees[month] = "Paid";
         
-        // දැනට තියෙන දිනය සහ වෙලාව ගන්නවා
         let now = new Date();
         let dateString = now.toLocaleDateString('en-GB') + " - " + now.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'});
-        s.paymentDates[month] = dateString; // System එකේ සේව් වෙනවා
+        s.paymentDates[month] = dateString;
         
         let receiptNo = "RCPT-" + Date.now().toString().slice(-6); 
         
@@ -303,16 +299,15 @@ function addOrUpdateStudent() {
             marks: {}, attendance: {}, fees: {} 
         });
     } else {
-    // Edit කරන අවස්ථාව
-    let existingJoinedMonth = students[editIdx].joinedMonth || currentMonth;
+        let existingJoinedMonth = students[editIdx].joinedMonth || currentMonth;
 
-    students[editIdx].name = name;
-    students[editIdx].dob = dob;
-    students[editIdx].phone = phone;
-    students[editIdx].grade = grade;
-    students[editIdx].group = group;
-    students[editIdx].fee = fee;
-    students[editIdx].joinedMonth = existingJoinedMonth; // එකතු කරන්න
+        students[editIdx].name = name;
+        students[editIdx].dob = dob;
+        students[editIdx].phone = phone;
+        students[editIdx].grade = grade;
+        students[editIdx].group = group;
+        students[editIdx].fee = fee;
+        students[editIdx].joinedMonth = existingJoinedMonth;
         
         if(!students[editIdx].marks) students[editIdx].marks = {};
         if(!students[editIdx].attendance) students[editIdx].attendance = {};
@@ -344,20 +339,19 @@ function updateIncomeSummary(dataToShow) {
     let counts = {}; 
 
     listToCalculate.forEach(s => {
-    let fee = parseFloat(s.fee) || 0;
-    
-    // Excused කර නැතිනම් පමණක් Expected Income එකට එකතු කරයි
-    if (!s.fees || s.fees[month] !== "Excused") {
-        totalExpected += fee;
-    }
-    
-    if (s.fees && s.fees[month] === "Paid") {
-        totalCollected += fee;
-    }
+        let fee = parseFloat(s.fee) || 0;
+        
+        if (!s.fees || s.fees[month] !== "Excused") {
+            totalExpected += fee;
+        }
+        
+        if (s.fees && s.fees[month] === "Paid") {
+            totalCollected += fee;
+        }
 
-    let g = s.grade || "N/A";
-    counts[g] = (counts[g] || 0) + 1;
-});
+        let g = s.grade || "N/A";
+        counts[g] = (counts[g] || 0) + 1;
+    });
 
     let totalPending = totalExpected - totalCollected;
 
@@ -396,17 +390,18 @@ function toggleDarkMode() {
     }
 }
 
-// 🎉 Check Birthdays & Display Individual Cards
 function checkBirthdays() {
     let today = new Date();
     let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
     let alertDiv = document.getElementById("birthdayAlert");
     if (!alertDiv) return;
 
-    let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
+    let birthdaysToday = students.filter(s => {
+        let bDay = s.birthday || s.dob || "";
+        return bDay.includes(dateStr);
+    });
     
     if (birthdaysToday.length > 0) {
-        // එක් එක් ළමයා වෙන වෙනම ලිස්ට් එකක් විදිහට හදනවා
         let itemsHtml = birthdaysToday.map(s => {
             let sIdx = students.indexOf(s);
             return `
@@ -439,7 +434,6 @@ function checkBirthdays() {
     }
 }
 
-// 📲 එක ළමයෙක්ට විතරක් වෙන වෙනම Wish කරන්න
 function sendSingleBirthdayWish(idx) {
     let s = students[idx];
     let msg = `🌟 *HAPPY BIRTHDAY!* 🌟\n\n` +
@@ -451,11 +445,126 @@ function sendSingleBirthdayWish(idx) {
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-// 🚀 Modal Queue එක හරහා ඔක්කොටම එකින් එක යවන්න
+// ========================================================
+// 🎉 BIRTHDAY WISHES BULK QUEUE
+// ========================================================
 function sendBulkBirthdaysModal() {
     let today = new Date();
     let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
-    let birthdaysToday = students.filter(s => s.dob && s.dob.includes(dateStr));
+    
+    let birthdaysToday = students.filter(s => {
+        let bDay = s.birthday || s.dob || "";
+        return bDay.includes(dateStr);
+    });
+
+    let queue = birthdaysToday.map(s => {
+        let msg = `🌟 *HAPPY BIRTHDAY!* 🌟\n\n` +
+                  `ආදරණීය *${s.name}*,\n` +
+                  `ඔබට ලැබුවාවූ උපන්දිනය වාසනාවන්ත, සතුට පිරුණු සුබ උපන්දිනයක් වේවා කියා ප්‍රාර්ථනා කරමි! 🎂✨\n\n` +
+                  `ඉදිරි අධ්‍යාපන කටයුතු සහ සියලු හීන සැබෑ වේවා!\n\n` +
+                  `මීට,\n*Thilina Sir*`;
+        return { student: s, message: msg };
+    });
+
+    startBulkQueue(queue, "🎉 Birthday Wishes Queue");
+}
+
+// ========================================================
+// ⚠️ INDIVIDUAL 4-WEEK REMINDER
+// ========================================================
+function send4WeekRemind(idx, month) {
+    let s = students[idx];
+    if (!s.phone) {
+        alert("මෙම සිසුවාට දුරකථන අංකයක් ඇතුළත් කර නැත!");
+        return;
+    }
+    
+    let msg = `ආදරණීය දෙමාපියනි, 🙏\n\n` +
+              `ඔබගේ දරුවා (*${s.name}*) අපගේ පන්තියට නිතරම සහභාගී වන අයුරු දැකීම සතුටකි. ` +
+              `කෙසේ වෙතත්, පසුගිය *${month}* මාසයට අදාළ පන්ති ගාස්තු ගෙවීම් පිළිබඳව තවමත් අපගේ පද්ධතියේ යාවත්කාලීන වී නැති බව කාරුණිකව මතක් කර සිටිමු.\n\n` +
+              `ඔබ දැනටමත් එම ගෙවීම සිදු කර ඇත්නම්, කරුණාකර මෙම පණිවිඩය නොසලකා හරින්න. ` +
+              `කිසියම් අපහසුතාවක් ඇත්නම් අපව දැනුවත් කරන මෙන් ඉල්ලා සිටිමි.\n\n` +
+              `ස්තුතියි! 🌸\n*Excellence Maths Class*`;
+              
+    window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+}// ========================================================
+// 🚀 BULK QUEUE CONTROLLER & ACTIONS
+// ========================================================
+
+function startBulkQueue(list, title) {
+    if (list.length === 0) {
+        alert("ලිස්ට් එකේ යවන්න ළමයි කවුරුත් නැත!");
+        return;
+    }
+    bulkQueue = list;
+    bulkCurrentIndex = 0;
+    
+    let modalTitle = document.getElementById("bulkModalTitle");
+    if(modalTitle) modalTitle.innerText = title;
+    
+    let bulkModal = document.getElementById("bulkModal");
+    if(bulkModal) bulkModal.style.display = "flex";
+    
+    updateBulkModalUI();
+}
+
+function updateBulkModalUI() {
+    let total = bulkQueue.length;
+    let current = bulkCurrentIndex;
+    let percentage = total > 0 ? Math.round((current / total) * 100) : 0;
+    
+    let progressBar = document.getElementById("bulkProgressBar");
+    if(progressBar) progressBar.style.width = percentage + "%";
+    
+    let statusDiv = document.getElementById("bulkModalStatus");
+    let sendBtn = document.getElementById("bulkSendBtn");
+
+    if (current < total) {
+        let item = bulkQueue[current];
+        if(statusDiv) {
+            statusDiv.innerHTML = `<b>Progress:</b> (${current + 1}/${total}) sent<br>` +
+                                  `<b>Next Student:</b> ${item.student.name} (${item.student.phone || 'No phone'})`;
+        }
+        if(sendBtn) {
+            sendBtn.style.display = "block";
+            sendBtn.innerText = `🚀 Send to ${item.student.name}`;
+        }
+    } else {
+        if(statusDiv) statusDiv.innerHTML = `<b>✅ සියලුම මැසේජ් යවා අවසන්!</b>`;
+        if(sendBtn) sendBtn.style.display = "none";
+    }
+}
+
+function sendNextBulkMessage() {
+    if (bulkCurrentIndex < bulkQueue.length) {
+        let item = bulkQueue[bulkCurrentIndex];
+        if (item.student.phone) {
+            window.open(`https://wa.me/${item.student.phone}?text=${encodeURIComponent(item.message)}`, '_blank');
+        }
+        bulkCurrentIndex++;
+        updateBulkModalUI();
+    }
+}
+
+function closeBulkModal() {
+    let bulkModal = document.getElementById("bulkModal");
+    if(bulkModal) bulkModal.style.display = "none";
+    bulkQueue = [];
+    bulkCurrentIndex = 0;
+}
+
+// ========================================================
+// 🎂 BIRTHDAY & REMINDER BULK FUNCTIONS
+// ========================================================
+
+function sendBulkBirthdaysModal() {
+    let today = new Date();
+    let dateStr = (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
+    
+    let birthdaysToday = students.filter(s => {
+        let bDay = s.birthday || s.dob || "";
+        return bDay.includes(dateStr);
+    });
 
     let queue = birthdaysToday.map(s => {
         let msg = `🌟 *HAPPY BIRTHDAY!* 🌟\n\n` +
@@ -471,67 +580,21 @@ function sendBulkBirthdaysModal() {
 
 function send4WeekRemind(idx, month) {
     let s = students[idx];
-    let msg = `*දෙමාපියන්ගේ විශේෂ අවධානය පිණිසයි,* \n\n` +
-              `ඔබගේ දරුවා (*${s.name}*) *${month}* මාසයේ සති 4ක්ම පන්තියට සහභාගී වී ඇත.\n\n` +
-              `නමුත් පද්ධතියට අනුව එම මාසය සඳහා වන ගාස්තු තවමත් ගෙවා ඇති බව සටහන් වී නොමැත. කරුණාකර අද දින මේ පිළිබඳව සොයා බලා කටයුතු කරන ලෙස කාරුණිකව දන්වා සිටිමු. \n\n` +
-              `ස්තූතියි! \n*Excellence Maths Class*`;
+    if (!s.phone) {
+        alert("මෙම සිසුවාට දුරකථන අංකයක් ඇතුළත් කර නැත!");
+        return;
+    }
+    
+    let msg = `ආදරණීය දෙමාපියනි, 🙏\n\n` +
+              `ඔබගේ දරුවා (*${s.name}*) අපගේ පන්තියට නිතරම සහභාගී වන අයුරු දැකීම සතුටකි. ` +
+              `කෙසේ වෙතත්, පසුගිය *${month}* මාසයට අදාළ පන්ති ගාස්තු ගෙවීම් පිළිබඳව තවමත් අපගේ පද්ධතියේ යාවත්කාලීන වී නැති බව කාරුණිකව මතක් කර සිටිමු.\n\n` +
+              `ඔබ දැනටමත් එම ගෙවීම සිදු කර ඇත්නම්, කරුණාකර මෙම පණිවිඩය නොසලකා හරින්න. ` +
+              `කිසියම් අපහසුතාවක් ඇත්නම් අපව දැනුවත් කරන මෙන් ඉල්ලා සිටිමි.\n\n` +
+              `ස්තුතියි! 🌸\n*Excellence Maths Class*`;
+              
     window.open(`https://wa.me/${s.phone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-// ========================================================
-// 🚀 100% WORKING BULK MESSAGING SYSTEM (QUEUE WITH MODAL)
-// ========================================================
-
-function startBulkQueue(list, title) {
-    if (list.length === 0) {
-        alert("ලිස්ට් එකේ යවන්න ළමයි කවුරුත් නැත!");
-        return;
-    }
-    bulkQueue = list;
-    bulkCurrentIndex = 0;
-    
-    document.getElementById("bulkModalTitle").innerText = title;
-    document.getElementById("bulkModal").style.display = "flex";
-    updateBulkModalUI();
-}
-
-function updateBulkModalUI() {
-    let total = bulkQueue.length;
-    let current = bulkCurrentIndex;
-    
-    if (current >= total) {
-        document.getElementById("bulkModalStatus").innerHTML = "<b>✅ සියලුම මැසේජ් යවා අවසන්!</b>";
-        document.getElementById("bulkProgressBar").style.width = "100%";
-        document.getElementById("bulkSendBtn").style.display = "none";
-        return;
-    }
-
-    let item = bulkQueue[current];
-    let percentage = Math.round((current / total) * 100);
-    
-    document.getElementById("bulkModalStatus").innerHTML = `<b>(${current + 1}/${total})</b> Sending to: <b>${item.student.name}</b>`;
-    document.getElementById("bulkProgressBar").style.width = percentage + "%";
-    document.getElementById("bulkSendBtn").style.display = "block";
-    document.getElementById("bulkSendBtn").innerText = `🚀 Send to ${item.student.name}`;
-}
-
-function sendNextBulkMessage() {
-    if (bulkCurrentIndex < bulkQueue.length) {
-        let item = bulkQueue[bulkCurrentIndex];
-        window.open(`https://wa.me/${item.student.phone}?text=${encodeURIComponent(item.message)}`, '_blank');
-        
-        bulkCurrentIndex++;
-        updateBulkModalUI();
-    }
-}
-
-function closeBulkModal() {
-    document.getElementById("bulkModal").style.display = "none";
-    bulkQueue = [];
-    bulkCurrentIndex = 0;
-}
-
-// Bulk Action Buttons (Updated)
 function sendBulkProgress() {
     let month = document.getElementById("monthSelect").value;
     let search = document.getElementById("searchBar").value.toLowerCase();
@@ -594,7 +657,7 @@ function sendBulk3WeekReminders() {
         let matchesGroup = (selectedGroup === "All") || (studentGroup === selectedGroup);
         
         let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
-        let isUnpaid = (s.fees?.[month] !== "Paid");
+        let isUnpaid = (s.fees?.[month] !== "Paid" && s.fees?.[month] !== "Excused");
         
         let isAvailableInMonth = true;
         if (s.joinedMonth) {
@@ -620,7 +683,7 @@ function sendBulk4WeekReminders() {
     
     let filtered = students.filter(s => {
         let attendanceCount = (s.attendance?.[month] || []).filter(a => a === "P").length;
-        let isUnpaid = (s.fees?.[month] !== "Paid");
+        let isUnpaid = (s.fees?.[month] !== "Paid" && s.fees?.[month] !== "Excused");
         
         let isAvailableInMonth = true;
         if (s.joinedMonth) {
@@ -640,38 +703,6 @@ function sendBulk4WeekReminders() {
     startBulkQueue(queue, "🚨 4-Week Alerts");
 }
 
-function exportToExcel() {
-    let csvContent = "data:text/csv;charset=utf-8,\uFEFFName,Phone,Grade,Group,Monthly Fee\n";
-    students.forEach(s => {
-        csvContent += `"${s.name}","${s.phone}","${s.grade}","${s.group}","${s.fee}"\n`;
-    });
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "Student_List_Backup.csv");
-    document.body.appendChild(link);
-    link.click();
-}
-
-function showSection(sectionId) {
-    document.querySelectorAll('.nav-section').forEach(section => {
-        section.style.display = 'none';
-    });
-    let activeSection = document.getElementById(sectionId);
-    if (activeSection) {
-        activeSection.style.display = 'block';
-    }
-    const navButtons = document.querySelectorAll('.navbar button');
-    navButtons.forEach(btn => {
-        if (btn.getAttribute('onclick').includes(sectionId)) {
-            btn.style.background = '#2980b9';
-        } else {
-            btn.style.background = '#34495e';
-        }
-    });
-}
-
-// ✉️ Send Any Custom Message to Filtered Students Queue
 function sendCustomBulkMessage() {
     let msgText = document.getElementById("customBulkMsg").value.trim();
     
@@ -686,7 +717,6 @@ function sendCustomBulkMessage() {
     let selectedGroup = document.getElementById("groupFilter").value;
     let currentMonthIdx = monthsOrder.indexOf(month);
 
-    // Filter වෙලා තියෙන ළමයි ලිස්ට් එක ගන්නවා
     let filtered = students.filter(s => {
         let matchesSearch = (s.name || "").toLowerCase().includes(search);
         let matchesGrade = (selectedGrade === "All") || (s.grade === selectedGrade);
@@ -701,35 +731,34 @@ function sendCustomBulkMessage() {
         return matchesSearch && matchesGrade && matchesGroup && isAvailableInMonth;
     });
 
-    // Queue එක හදනවා
     let queue = filtered.map(s => {
-        // ළමයාගේ නම එක්ක මැසේජ් එක ලස්සනට Format කරගන්නවා
         let formattedMsg = `ආදරණීය දෙමාපියන්ගේ / දරුවාගේ (*${s.name}*) අවධානය පිණිසයි,\n\n` +
                            `${msgText}\n\n` +
                            `ස්තූතියි!\n*Thilina Sir*`;
-
         return { student: s, message: formattedMsg };
     });
 
-    // අර අපි හදපු Modal Queue එකෙන්ම යවනවා
     startBulkQueue(queue, "📢 Custom Notice Broadcast");
 }
 
-async function toggleExcused(idx, month) {
-    if (!students[idx].fees) students[idx].fees = {};
-    
-    // Toggle Logic: Excused නම් Unpaid කරයි, නැත්නම් Excused කරයි
-    if (students[idx].fees[month] === "Excused") {
-        students[idx].fees[month] = "Unpaid";
-    } else {
-        students[idx].fees[month] = "Excused";
-    }
-    
-    await saveData();
-    renderStudents();
+// ========================================================
+// 📁 EXCEL / JSON BACKUP & RESTORE UTILITIES
+// ========================================================
+
+function exportToExcel() {
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFFName,Phone,Grade,Group,Monthly Fee\n";
+    students.forEach(s => {
+        csvContent += `"${s.name}","${s.phone}","${s.grade}","${s.group}","${s.fee}"\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Student_List_Backup.csv");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
 }
 
-// 📤 1. Data Backup එක JSON File එකක් විදිහට Download කිරීම
 function exportJSONBackup() {
     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(students, null, 2));
     let downloadAnchor = document.createElement('a');
@@ -740,7 +769,6 @@ function exportJSONBackup() {
     downloadAnchor.remove();
 }
 
-// 📥 2. JSON File එකෙන් System එකට Data Restore කිරීම
 function importJSONBackup(event) {
     let file = event.target.files[0];
     if (!file) return;
@@ -752,12 +780,10 @@ function importJSONBackup(event) {
             if (Array.isArray(importedData)) {
                 if (confirm("ඔබට තහවුරුද? දැනට ඇති Data සියල්ල වෙනුවට මෙම Backup එක Load වේ!")) {
                     students = importedData;
-                    await saveData(); // Update the Google Apps Script database
-                    renderStudents(); // Refresh the student list on screen
-                    checkBirthdays(); // Re-check for any birthdays in the new data
+                    await saveData(); 
+                    renderStudents(); 
+                    checkBirthdays(); 
                     alert("Data successfully restored! (දත්ත සාර්ථකව Restore කරන ලදී!)");
-                    
-                    // Clear the file input so the same file can be uploaded again if needed
                     event.target.value = ""; 
                 }
             } else {
@@ -771,116 +797,10 @@ function importJSONBackup(event) {
     reader.readAsText(file);
 }
 
-// PDF Report එක Generate කරන Function එක
-function downloadReportCard(idx, month) {
-    let s = students[idx];
-    let score = s.marks?.[month] || 0;
-    
-    // දවස් කීයක් ආවද කියල ගණනය කිරීම
-    let attendanceArray = s.attendance?.[month] || ["-","-","-","-"];
-    let presentCount = attendanceArray.filter(a => a === "P").length;
-    
-    // පන්තියේ ස්ථානය (Rank) ගණනය කිරීම
-    let sameGradeStudents = students.filter(st => st.grade === s.grade);
-    let rankedInGrade = [...sameGradeStudents].sort((a, b) => (b.marks?.[month] || 0) - (a.marks?.[month] || 0));
-    let rank = rankedInGrade.findIndex(rs => rs.name === s.name) + 1;
-    
-    // PDF එකට අදාළ HTML Design එක
-    let printDiv = document.createElement("div");
-    printDiv.style.padding = "30px";
-    printDiv.style.fontFamily = "sans-serif";
-    printDiv.style.color = "#333";
-    printDiv.innerHTML = `
-        <div style="text-align: center; border-bottom: 2px solid #2980b9; padding-bottom: 10px; margin-bottom: 20px;">
-            <h1 style="color: #2980b9; margin: 0;">EXCELLENCE MATHS CLASS</h1>
-            <h3 style="margin: 5px 0;">Student Progress Report - ${month}</h3>
-        </div>
-        <div style="font-size: 16px; line-height: 1.8;">
-            <p><b>Student Name:</b> ${s.name}</p>
-            <p><b>Grade:</b> ${s.grade || 'N/A'}</p>
-            <p><b>Group/Class:</b> ${s.group || 'N/A'}</p>
-        </div>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-            <tr style="background: #f2f2f2;">
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Subject / Criteria</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Details</th>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 12px;">Monthly Marks</td>
-                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; font-size: 18px;">${score}</td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 12px;">Class Rank</td>
-                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold;">${rank}</td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 12px;">Attendance</td>
-                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold;">${presentCount} / 4 Days</td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 12px;">Fee Status</td>
-                <td style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; color: ${s.fees?.[month] === "Paid" ? "green" : "red"};">${s.fees?.[month] || "Unpaid"}</td>
-            </tr>
-        </table>
-        <div style="margin-top: 60px; text-align: right;">
-            <p>.......................................</p>
-            <p><b>Thilina Sir (Signature)</b></p>
-        </div>
-    `;
-    
-    // PDF එක Download වෙන විදිහ සකස් කිරීම
-    let opt = {
-        margin:       10,
-        filename:     `${s.name}_${month}_Report.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    
-    // PDF එක හදලා Save කරන්න
-    html2pdf().set(opt).from(printDiv).save();
-}
 // ========================================================
-// 🚀 BULK QUEUE CONTROLLER & PDF REPORT GENERATOR
+// 📄 PDF REPORT GENERATOR & EXCEED / NAVIGATION
 // ========================================================
 
-function updateBulkModalUI() {
-    let total = bulkQueue.length;
-    let current = bulkCurrentIndex;
-    let percentage = total > 0 ? (current / total) * 100 : 0;
-    
-    document.getElementById("bulkProgressBar").style.width = percentage + "%";
-    
-    if (current < total) {
-        let item = bulkQueue[current];
-        document.getElementById("bulkModalStatus").innerHTML = 
-            `<b>Progress:</b> ${current} / ${total} sent<br>` +
-            `<b>Next Student:</b> ${item.student.name} (${item.student.phone || 'No phone'})`;
-        document.getElementById("bulkSendBtn").innerText = "🚀 Send Next Message";
-    } else {
-        document.getElementById("bulkModalStatus").innerHTML = `✅ All messages processed successfully!`;
-        document.getElementById("bulkSendBtn").innerText = "✔ Done";
-    }
-}
-
-function sendNextBulkMessage() {
-    if (bulkCurrentIndex < bulkQueue.length) {
-        let item = bulkQueue[bulkCurrentIndex];
-        if (item.student.phone) {
-            window.open(`https://wa.me/${item.student.phone}?text=${encodeURIComponent(item.message)}`, '_blank');
-        }
-        bulkCurrentIndex++;
-        updateBulkModalUI();
-    } else {
-        closeBulkModal();
-    }
-}
-
-function closeBulkModal() {
-    document.getElementById("bulkModal").style.display = "none";
-}
-
-// PDF Report Card Generator Function
 function downloadReportCard(idx, month) {
     let s = students[idx];
     let score = s.marks?.[month] || 0;
@@ -935,20 +855,48 @@ function downloadReportCard(idx, month) {
     `;
     
     let opt = {
-        margin:       10,
-        filename:     `${s.name}_${month}_Report.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        margin:        10,
+        filename:      `${s.name}_${month}_Report.pdf`,
+        image:         { type: 'jpeg', quality: 0.98 },
+        html2canvas:   { scale: 2 },
+        jsPDF:         { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
     html2pdf().set(opt).from(printDiv).save();
 }
 
-function toggleExcused(sIdx, month) {
-    let s = students[sIdx];
+function toggleExcused(idx, month) {
+    let s = students[idx];
     if (!s.fees) s.fees = {};
     s.fees[month] = s.fees[month] === 'Excused' ? 'Unpaid' : 'Excused';
     saveData();
     renderStudents();
+}
+
+function showSection(sectionId) {
+    document.querySelectorAll('.nav-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    let activeSection = document.getElementById(sectionId);
+    if (activeSection) {
+        activeSection.style.display = 'block';
+    }
+    const navButtons = document.querySelectorAll('.navbar button');
+    navButtons.forEach(btn => {
+        let onclickAttr = btn.getAttribute('onclick') || "";
+        if (onclickAttr.includes(sectionId)) {
+            btn.style.background = '#2980b9';
+        } else {
+            btn.style.background = '#34495e';
+        }
+    });
+
+    function cleanPhoneNumber(phone) {
+    if (!phone) return "";
+    let cleaned = phone.replace(/\D/g, ''); // අංක පමණක් තබාගන්න
+    if (cleaned.startsWith('0')) {
+        cleaned = '94' + cleaned.substring(1); // 0 ඉවත් කර 94 එකතු කරන්න
+    }
+    return cleaned;
+}
 }
