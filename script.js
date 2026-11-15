@@ -1,7 +1,7 @@
 // ========================================================
 // ⚙️ GLOBAL CONFIGURATION & VARIABLES
 // ========================================================
-const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE"; // ඔබේ Apps Script Web App URL එක මෙහි යොදන්න
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybyvl6GtFlgpUgx4N9kY7X_tXnY5-inbSsjcUyuhXtEw4Dy1wH0Jo3HYH3X0M8WVt3/exec"; // ඔබේ Apps Script Web App URL එක මෙහි යොදන්න
 const API_TOKEN = "ThilinaMaths@2026_Secure";
 
 let students = [];
